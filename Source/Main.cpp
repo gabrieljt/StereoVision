@@ -8,7 +8,7 @@ int main()
 {
     try
     {
-        Application app;
+        Application app("Left Camera", "Right Camera");
         app.run();
     }
     catch (std::exception& e)

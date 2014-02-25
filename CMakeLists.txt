@@ -27,6 +27,10 @@ set(HEADERS
 set(EXECUTABLE_NAME StereoVision)
 add_executable(${EXECUTABLE_NAME} ${SOURCE} ${HEADERS})
 
+# Find OpenCV libraries
+find_package(OpenCV REQUIRED)
+target_link_libraries(${EXECUTABLE_NAME} ${OpenCV_LIBS})
+
 # Install Target
 install(TARGETS ${EXECUTABLE_NAME} DESTINATION .)
 
