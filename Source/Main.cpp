@@ -16,4 +16,3 @@ int main()
         std::cout << "EXCEPTION: " << e.what() << std::endl;
     }
 }
-

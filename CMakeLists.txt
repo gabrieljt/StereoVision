@@ -33,4 +33,3 @@ install(TARGETS ${EXECUTABLE_NAME} DESTINATION .)
 # CPack packaging
 include(InstallRequiredSystemLibraries)
 include(CPack)
-

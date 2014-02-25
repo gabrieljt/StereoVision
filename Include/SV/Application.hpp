@@ -13,4 +13,3 @@ class Application
 };
 
 #endif // SV_APPLICATION_HPP
-

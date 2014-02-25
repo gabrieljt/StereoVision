@@ -19,4 +19,3 @@ void Application::update()
 void Application::render()
 {
 }
-
