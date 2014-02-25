@@ -1,22 +1,28 @@
 #ifndef SV_APPLICATION_HPP
 #define SV_APPLICATION_HPP
 
+#include <pylon/PylonIncludes.h>
+
 #include <string>
 
 
 class Application
 {
     public:
-                Application(const std::string leftCameraWindow, const std::string rightCameraWindow);
-        void    run();
+                                    Application();
+        void                        run();
 
     private:
-        void    update();
-        void    render();
+        void                        capture();
+        void                        render();
 
     private:
-    	const std::string mLeftCameraWindow;
-    	const std::string mRightCameraWindow;
+        const size_t                mNumberOfCameras;        
+        std::vector<std::string>    mNamedWindows;          // OpenCV NamedWindows
+        Pylon::PylonAutoInitTerm    mAutoInitTerm;
+        Pylon::CTlFactory&          mTransportLayerFactory;
+        Pylon::DeviceInfoList_t     mDevices;
+        Pylon::CInstantCameraArray  mCameras;              
 };
 
 #endif // SV_APPLICATION_HPP
