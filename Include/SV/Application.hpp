@@ -14,7 +14,6 @@ class Application
 
     private:
         void                        capture();
-        void                        render();
 
     private:
         const size_t                mNumberOfCameras;        
