@@ -1,12 +1,25 @@
 #include <SV/Application.hpp>
 
+#include <pylon/PylonGUI.h>
+#include <pylon/FeaturePersistence.h>
+#include <GenApi/INodeMap.h>
+#include <GenApi/Types.h>
+
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 
 #include <iostream>
 #include <memory>
 #include <stdexcept>
 
+
+namespace
+{
+	const char configurationFile[] = "Config/default.pfs";
+	const int INTERPACKET_DELAY = 9018;
+	const int FRAME_TRANSMISSION_DELAY = 6233;
+}
 
 Application::Application()
 : mNumberOfCameras(2)
@@ -16,68 +29,96 @@ Application::Application()
 , mDevices()
 , mCameras(mNumberOfCameras)
 {
-	std::cout << "Initializing Stereo Vision..." << std::endl;    
+	std::cout << "Initializing Stereo Vision..." << std::endl << std::endl;    
 
 	if (mTransportLayerFactory.EnumerateDevices(mDevices) == 0)
 		throw std::runtime_error("Application::Application() - No Camera Devices found");
 
 	for (size_t i = 0; i < mDevices.size(); ++i)
 	{	    
-		// Attach Device to Pylon's Camera Array
-		auto camera = mTransportLayerFactory.CreateDevice(mDevices[i]);
-		mCameras[i].Attach(camera);
+		// Attach device to Pylon's camera array; Get camera and it's nodemap pointers for configuration
+		mCameras[i].Attach(mTransportLayerFactory.CreateDevice(mDevices[i]));
+		Pylon::CInstantCamera &camera = mCameras[i];
+		GenApi::INodeMap& nodeMap = camera.GetNodeMap();
 
-		// Create OpenCV NamedWindow
+		// Create OpenCV NamedWindow; Get camera information
 		std::string cameraName("Camera ");
 		cameraName += std::to_string(i) + ": ";
-		cameraName += mCameras[i].GetDeviceInfo().GetModelName();
+		cameraName += camera.GetDeviceInfo().GetModelName();
 		mNamedWindows.push_back(cameraName);
+		std::cout << "Found " + cameraName << std::endl;
+		/*
 		cv::namedWindow(cameraName, CV_WINDOW_AUTOSIZE);
-		cv::moveWindow(cameraName, 100u * (i + (size_t) 1u), 100u * (i + (size_t) 1u));     		
+		cv::moveWindow(cameraName, (size_t) 100u * (i + (size_t) 1u), (size_t) 100u * (i + (size_t) 1u));
+		*/
 
-		// Setup Cameras for Multiple Grab
-		
+		// Load and display default settings
+		camera.Open();		
+		Pylon::CFeaturePersistence::Load(configurationFile, &nodeMap, true);
+		std::cout << "Loaded default configuration for " + cameraName << std::endl;
+		std::cout << std::endl;			
+		std::cout << "Area Of Interest (AOI) Settings:" << std::endl;
+		std::cout << "Width: " << GenApi::CIntegerPtr(nodeMap.GetNode("Width"))->GetValue() << std::endl;
+		std::cout << "Height: " << GenApi::CIntegerPtr(nodeMap.GetNode("Height"))->GetValue() << std::endl;
+		std::cout << "Offset X: " << GenApi::CIntegerPtr(nodeMap.GetNode("OffsetX"))->GetValue() << std::endl;
+		std::cout << "Offset Y: " << GenApi::CIntegerPtr(nodeMap.GetNode("OffsetY"))->GetValue() << std::endl;
+		std::cout << std::endl;
+		std::cout << "Pixel Format: " << GenApi::CEnumerationPtr(nodeMap.GetNode("PixelFormat"))->ToString() << std::endl;
+		std::cout << std::endl;
+		std::cout << "Setting Network Parameters..." << std::endl;
+		std::cout << "Packet Size: " << GenApi::CIntegerPtr(nodeMap.GetNode("GevSCPSPacketSize"))->GetValue() << std::endl;
+		GenApi::CIntegerPtr interpacketDelay(nodeMap.GetNode("GevSCPD"));
+		interpacketDelay->SetValue(INTERPACKET_DELAY);
+		GenApi::CIntegerPtr frameTransmissionDelay(nodeMap.GetNode("GevSCFTD"));
+		frameTransmissionDelay->SetValue((i + (size_t) 1u) * FRAME_TRANSMISSION_DELAY);
+		std::cout << "Inter-Packet Delay: " << interpacketDelay->GetValue() << std::endl;
+		std::cout << "Frame Transmission Delay: " << frameTransmissionDelay->GetValue() << std::endl;
+		std::cout << std::endl;
 	}	
 }
 
 void Application::run()
 {	
-	capture();
+	if (mCameras.IsOpen())
+	{
+		std::cout << "Initializing Capture..." << std::endl;
+		capture();
+	}
+	mCameras.Close();
+	cv::destroyAllWindows();
 }
 
 void Application::capture()
 {
-	mCameras.StartGrabbing();
-	Pylon::CGrabResultPtr ptrGrabResult;
-
+	Pylon::CGrabResultPtr grabResult;
+	
+	mCameras.StartGrabbing();	
 	while(mCameras.IsGrabbing())
 	{
-		mCameras.RetrieveResult(5000, ptrGrabResult, Pylon::TimeoutHandling_ThrowException);
-		if (ptrGrabResult->GrabSucceeded())
+		mCameras.RetrieveResult(5000, grabResult, Pylon::TimeoutHandling_ThrowException);
+		if (grabResult->GrabSucceeded())
 		{        
-			auto cameraContextValue = ptrGrabResult->GetCameraContext();
-			auto imageWidth = ptrGrabResult->GetWidth();
-			auto imageHeight = ptrGrabResult->GetHeight();
-			const auto *imageBuffer = (uint8_t *) ptrGrabResult->GetBuffer();
-
+			auto cameraContextValue = grabResult->GetCameraContext();
+			auto imageWidth = grabResult->GetWidth();
+			auto imageHeight = grabResult->GetHeight();
+			const auto *imageBuffer = (uint8_t *) grabResult->GetBuffer();
+			/*
 			std::cout << "Camera " <<  cameraContextValue << ": " << mCameras[cameraContextValue].GetDeviceInfo().GetModelName() << std::endl;
 			std::cout << "SizeX: " << imageWidth << std::endl;
 			std::cout << "SizeY: " << imageHeight << std::endl;
 			std::cout << "Gray value of first pixel: " << (uint32_t) imageBuffer[0] << std::endl << std::endl;
-
-			
-			auto img = cv::Mat(imageHeight, imageWidth, CV_8UC1); // manages it's own memory
-
-			// copies from Result.Buffer into img 
-			memcpy(img.ptr(),ptrGrabResult->GetBuffer(),ptrGrabResult->GetWidth()*ptrGrabResult->GetHeight()); 
+			*/			
+			// OpenCV image
+			Pylon::DisplayImage(cameraContextValue, grabResult);
 			/*
-			for (int irow = 0; irow < imageHeight; ++irow) 
-				memcpy(img.ptr(irow),imageBuffer + (irow * imageWidth), imageWidth);			
+			auto image = cv::Mat(imageHeight, imageWidth, CV_8U);			
+			// Copies from buffer into OpenCV image 
+			std::memcpy(image.ptr(), imageBuffer, imageWidth * imageHeight); 			
+			cv::imshow(mNamedWindows[cameraContextValue], image);
 			*/
-			cv::imshow(mNamedWindows[cameraContextValue], img);
-
-			int c = cv::waitKey(30);
-			if( c == 'q' || c == 'Q' || (c & 255) == 27 )
+			// Keyboard input break
+			int key = cv::waitKey(30);
+			if( key == 'q' || key == 'Q' || (key & 255) == 27 )
 				break;
 		}
 	}

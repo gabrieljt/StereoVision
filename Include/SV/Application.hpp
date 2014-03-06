@@ -1,8 +1,11 @@
 #ifndef SV_APPLICATION_HPP
 #define SV_APPLICATION_HPP
 
-#include <pylon/PylonIncludes.h>
 
+#include <pylon/TlFactory.h>
+#include <pylon/InstantCameraArray.h>
+
+#include <vector>
 #include <string>
 
 
