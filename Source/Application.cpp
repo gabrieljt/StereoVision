@@ -10,7 +10,6 @@
 
 #include <iostream>
 #include <cstring>
-#include <memory>
 #include <stdexcept>
 
 
@@ -20,6 +19,7 @@ namespace
 	const char configurationFile[] = "Config/default_linux.pfs";   // Windows: default.pfs ; Linux: default_linux.pfs
 	const int INTERPACKET_DELAY = 8192;                            // Windows: 9018 ; Linux: 8192
 	const int FRAME_TRANSMISSION_DELAY = 4096;                     // Windows: 6233 ; Linux: 4096
+    const std::string lineBreak = "================================";
 }
 
 Application::Application()
@@ -30,7 +30,8 @@ Application::Application()
 , mDevices()
 , mCameras(mNumberOfCameras)
 {
-	std::cout << "Initializing Stereo Vision..." << std::endl << std::endl;    
+	std::cout << "Initializing Stereo Vision..." << std::endl;  
+    std::cout << lineBreak << std::endl;  
 
 	if (mTransportLayerFactory.EnumerateDevices(mDevices) == 0)
 		throw std::runtime_error("Application::Application() - No Camera Devices found");
@@ -72,7 +73,7 @@ Application::Application()
 		frameTransmissionDelay->SetValue((i + (size_t) 1u) * FRAME_TRANSMISSION_DELAY);
 		std::cout << "Inter-Packet Delay: " << interpacketDelay->GetValue() << std::endl;
 		std::cout << "Frame Transmission Delay: " << frameTransmissionDelay->GetValue() << std::endl;
-		std::cout << std::endl;
+		std::cout << lineBreak << std::endl;
 	}	
 }
 
@@ -92,6 +93,7 @@ void Application::capture()
 	Pylon::CGrabResultPtr grabResult;
 	
 	mCameras.StartGrabbing();	
+    std::cout << "Capture started. Press ESC while focused on any window to exit." << std::endl;
 	while(mCameras.IsGrabbing())
 	{
 		mCameras.RetrieveResult(5000, grabResult, Pylon::TimeoutHandling_ThrowException);
@@ -100,22 +102,20 @@ void Application::capture()
 			auto cameraContextValue = grabResult->GetCameraContext();
 			auto imageWidth = grabResult->GetWidth();
 			auto imageHeight = grabResult->GetHeight();
-			const auto *imageBuffer = (uint8_t *) grabResult->GetBuffer();
-			/*
-			std::cout << "Camera " <<  cameraContextValue << ": " << mCameras[cameraContextValue].GetDeviceInfo().GetModelName() << std::endl;
-			std::cout << "SizeX: " << imageWidth << std::endl;
-			std::cout << "SizeY: " << imageHeight << std::endl;
-			std::cout << "Gray value of first pixel: " << (uint32_t) imageBuffer[0] << std::endl << std::endl;
-			*/
-			// OpenCV image
-			auto image = cv::Mat(imageHeight, imageWidth, CV_8U);			
-			// Copies from buffer into OpenCV image 
-			std::memcpy(image.ptr(), imageBuffer, imageWidth * imageHeight); 			
+			const auto *imageBuffer = (uint8_t *) grabResult->GetBuffer();		
+
+			// OpenCV image CV_8U: 8-bits, 1 channel
+			auto image = cv::Mat(imageHeight, imageWidth, CV_8UC1);
+			// Copies from buffer into OpenCV image - BOTTLENECK! OpenCL?
+            std::memcpy(image.ptr(), imageBuffer, imageWidth * imageHeight); 			
+            // Apply BayerGB8 Filter
+            cv::cvtColor(image, image, CV_BayerGB2RGB);
+            // Display image
 			cv::imshow(mNamedWindows[cameraContextValue], image);
 		    
-			// Keyboard input break
+			// Keyboard input break with ESC key
 			int key = cv::waitKey(30);
-			if( key == 'q' || key == 'Q' || (key & 255) == 27 )
+			if((key & 255) == 27)
 				break;
 		}
 	}

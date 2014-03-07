@@ -17,10 +17,10 @@ int main()
     {
         std::cout << "EXCEPTION: " << e.what() << std::endl;
 		exitCode = 1;
+        std::cout << std::endl << "Press Enter key to exit.";
+        std::cin.get();
     }
-	
-	std::cout << std::endl << "Press any key to exit.";
-	std::cin.get();
+    std::cout << "Bye!" << std::endl;
 
 	return exitCode;
 }
