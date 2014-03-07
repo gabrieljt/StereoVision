@@ -1,12 +1,13 @@
 #include <SV/Application.hpp>
 
+#include <pylon/PylonGUI.h>
 #include <pylon/FeaturePersistence.h>
 #include <GenApi/INodeMap.h>
 #include <GenApi/Types.h>
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
+//#include <opencv2/core/core.hpp>
+//#include <opencv2/highgui/highgui.hpp>
+//#include <opencv2/imgproc/imgproc.hpp>
 
 #include <iostream>
 #include <cstring>
@@ -16,9 +17,9 @@
 namespace
 {
     // TODO: cross-platform configuration
-	const char configurationFile[] = "Config/default_linux.pfs";   // Windows: default.pfs ; Linux: default_linux.pfs
-	const int INTERPACKET_DELAY = 8192;                            // Windows: 9018 ; Linux: 8192
-	const int FRAME_TRANSMISSION_DELAY = 4096;                     // Windows: 6233 ; Linux: 4096
+	const char configurationFile[] = "Config/default.pfs";   // Windows: default.pfs ; Linux: default_linux.pfs
+	const int INTERPACKET_DELAY = 9018;                            // Windows: 9018 ; Linux: 8192
+	const int FRAME_TRANSMISSION_DELAY = 6233;                     // Windows: 6233 ; Linux: 4096
     const std::string lineBreak = "================================";
 }
 
@@ -49,8 +50,8 @@ Application::Application()
 		cameraName += camera.GetDeviceInfo().GetModelName();
 		mNamedWindows.push_back(cameraName);
 		std::cout << "Found " + cameraName << std::endl;		
-		cv::namedWindow(cameraName, CV_WINDOW_AUTOSIZE);
-		cv::moveWindow(cameraName, (size_t) 100u * (i + (size_t) 1u), (size_t) 100u * (i + (size_t) 1u));
+		//cv::namedWindow(cameraName, CV_WINDOW_AUTOSIZE);
+		//cv::moveWindow(cameraName, 100 * (i + 1), 100 * (i + 1));
 		
 		// Load and display default settings
 		camera.Open();		
@@ -85,7 +86,7 @@ void Application::run()
 		capture();
 	}
 	mCameras.Close();
-    cv::destroyAllWindows();
+    //cv::destroyAllWindows();
 }
 
 void Application::capture()
@@ -94,29 +95,30 @@ void Application::capture()
 	
 	mCameras.StartGrabbing();	
     std::cout << "Capture started. Press ESC while focused on any window to exit." << std::endl;
-	while(mCameras.IsGrabbing())
+	int grabCount = 1000;
+	while(mCameras.IsGrabbing() && grabCount > 0)
 	{
 		mCameras.RetrieveResult(5000, grabResult, Pylon::TimeoutHandling_ThrowException);
 		if (grabResult->GrabSucceeded())
 		{        
 			auto cameraContextValue = grabResult->GetCameraContext();
-			auto imageWidth = grabResult->GetWidth();
-			auto imageHeight = grabResult->GetHeight();
-			const auto *imageBuffer = (uint8_t *) grabResult->GetBuffer();		
+			//auto imageWidth = grabResult->GetWidth();
+			//auto imageHeight = grabResult->GetHeight();
+			//const auto imageBuffer = grabResult->GetBuffer();		
 
 			// OpenCV image CV_8U: 8-bits, 1 channel
-			auto image = cv::Mat(imageHeight, imageWidth, CV_8UC1);
-			// Copies from buffer into OpenCV image - BOTTLENECK! OpenCL?
-            std::memcpy(image.ptr(), imageBuffer, imageWidth * imageHeight); 			
+			//auto image = cv::Mat(imageHeight, imageWidth, CV_8UC1, imageBuffer);
             // Apply BayerGB8 Filter
-            cv::cvtColor(image, image, CV_BayerGB2RGB);
+            //cv::cvtColor(image, image, CV_BayerGB2RGB);
             // Display image
-			cv::imshow(mNamedWindows[cameraContextValue], image);
-		    
+			//cv::imshow(mNamedWindows[cameraContextValue], image);
+			Pylon::DisplayImage(cameraContextValue, grabResult);
+
 			// Keyboard input break with ESC key
-			int key = cv::waitKey(30);
-			if((key & 255) == 27)
-				break;
+			//int key = cv::waitKey(30);
+			//if((key & 255) == 27)
+			//	break;
+			--grabCount;
 		}
 	}
 	mCameras.StopGrabbing();
