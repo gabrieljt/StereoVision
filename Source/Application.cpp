@@ -1,6 +1,5 @@
 #include <SV/Application.hpp>
 
-#include <pylon/PylonGUI.h>
 #include <pylon/FeaturePersistence.h>
 #include <GenApi/INodeMap.h>
 #include <GenApi/Types.h>
@@ -10,15 +9,17 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include <iostream>
+#include <cstring>
 #include <memory>
 #include <stdexcept>
 
 
 namespace
 {
-	const char configurationFile[] = "Config/default.pfs";
-	const int INTERPACKET_DELAY = 9018;
-	const int FRAME_TRANSMISSION_DELAY = 6233;
+    // TODO: cross-platform configuration
+	const char configurationFile[] = "Config/default_linux.pfs";   // Windows: default.pfs ; Linux: default_linux.pfs
+	const int INTERPACKET_DELAY = 8192;                            // Windows: 9018 ; Linux: 8192
+	const int FRAME_TRANSMISSION_DELAY = 4096;                     // Windows: 6233 ; Linux: 4096
 }
 
 Application::Application()
@@ -46,12 +47,10 @@ Application::Application()
 		cameraName += std::to_string(i) + ": ";
 		cameraName += camera.GetDeviceInfo().GetModelName();
 		mNamedWindows.push_back(cameraName);
-		std::cout << "Found " + cameraName << std::endl;
-		/*
+		std::cout << "Found " + cameraName << std::endl;		
 		cv::namedWindow(cameraName, CV_WINDOW_AUTOSIZE);
 		cv::moveWindow(cameraName, (size_t) 100u * (i + (size_t) 1u), (size_t) 100u * (i + (size_t) 1u));
-		*/
-
+		
 		// Load and display default settings
 		camera.Open();		
 		Pylon::CFeaturePersistence::Load(configurationFile, &nodeMap, true);
@@ -85,7 +84,7 @@ void Application::run()
 		capture();
 	}
 	mCameras.Close();
-	cv::destroyAllWindows();
+    cv::destroyAllWindows();
 }
 
 void Application::capture()
@@ -107,15 +106,13 @@ void Application::capture()
 			std::cout << "SizeX: " << imageWidth << std::endl;
 			std::cout << "SizeY: " << imageHeight << std::endl;
 			std::cout << "Gray value of first pixel: " << (uint32_t) imageBuffer[0] << std::endl << std::endl;
-			*/			
+			*/
 			// OpenCV image
-			Pylon::DisplayImage(cameraContextValue, grabResult);
-			/*
 			auto image = cv::Mat(imageHeight, imageWidth, CV_8U);			
 			// Copies from buffer into OpenCV image 
 			std::memcpy(image.ptr(), imageBuffer, imageWidth * imageHeight); 			
 			cv::imshow(mNamedWindows[cameraContextValue], image);
-			*/
+		    
 			// Keyboard input break
 			int key = cv::waitKey(30);
 			if( key == 'q' || key == 'Q' || (key & 255) == 27 )
@@ -124,4 +121,3 @@ void Application::capture()
 	}
 	mCameras.StopGrabbing();
 }
-
