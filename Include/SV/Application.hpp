@@ -12,14 +12,13 @@
 class Application
 {
     public:
-        Application();
+                                    Application();
         void                        run();
 
     private:
         void                        capture();
 
     private:
-        const size_t                mNumberOfCameras;        
         std::vector<std::string>    mNamedWindows;          // OpenCV NamedWindows
         Pylon::PylonAutoInitTerm    mAutoInitTerm;
         Pylon::CTlFactory&          mTransportLayerFactory;
