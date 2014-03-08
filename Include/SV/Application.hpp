@@ -5,9 +5,6 @@
 #include <pylon/TlFactory.h>
 #include <pylon/InstantCameraArray.h>
 
-#include <vector>
-#include <string>
-
 
 class Application
 {
@@ -19,7 +16,6 @@ class Application
         void                        capture();
 
     private:
-        std::vector<std::string>    mNamedWindows;          // OpenCV NamedWindows
         Pylon::PylonAutoInitTerm    mAutoInitTerm;
         Pylon::CTlFactory&          mTransportLayerFactory;
         Pylon::DeviceInfoList_t     mDevices;

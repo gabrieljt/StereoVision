@@ -13,19 +13,16 @@ namespace
     const std::string lineBreak = "================================";    
 }
 
-CameraConfiguration::CameraConfiguration(const char* configurationFile, const int interPacketDelay, int frameTransmissionDelay)
+CameraConfiguration::CameraConfiguration(const char* configurationFile, const int interPacketDelay, int frameTransmissionDelay, std::string cameraName)
 : mConfigurationFile(configurationFile)     
 , mInterPacketDelay(interPacketDelay)                                   
 , mFrameTransmissionDelay(frameTransmissionDelay)    
-, mCameraName("Camera ")                         
+, mCameraName(cameraName)                         
 {
 }
 
 void CameraConfiguration::OnOpened(Pylon::CInstantCamera& camera)
 {
-    mCameraName += std::to_string(camera.GetCameraContext());
-    mCameraName += ": ";
-    mCameraName += camera.GetDeviceInfo().GetModelName();
     GenApi::INodeMap& nodeMap = camera.GetNodeMap();
 
     std::cout << lineBreak << std::endl; 

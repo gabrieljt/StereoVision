@@ -17,12 +17,14 @@ include_directories("${PROJECT_SOURCE_DIR}/Include/")
 set(SOURCE
         ${PROJECT_SOURCE_DIR}/Source/Application.cpp
         ${PROJECT_SOURCE_DIR}/Source/CameraConfiguration.cpp
+        ${PROJECT_SOURCE_DIR}/Source/CameraCapture.cpp
         ${PROJECT_SOURCE_DIR}/Source/Main.cpp
 )
 
 set(HEADERS
         ${PROJECT_SOURCE_DIR}/Include/SV/Application.hpp
         ${PROJECT_SOURCE_DIR}/Include/SV/CameraConfiguration.hpp
+        ${PROJECT_SOURCE_DIR}/Include/SV/CameraCapture.hpp
 )
 
 # Define Executable
