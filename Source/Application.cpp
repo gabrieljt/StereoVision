@@ -59,16 +59,10 @@ Application::Application()
 
 void Application::run()
 {       
-    if (mCameras.IsOpen())
-    {
-        std::cout << lineBreak << std::endl;         
-        std::cout << "Initializing Capture..." << std::endl;
-        capture();
-    }
-    else 
-    {
-        throw std::runtime_error("Application::run() - Failed to Open Cameras");
-    }
+    if (mCameras.IsOpen())            
+        capture();    
+    else     
+        throw std::runtime_error("Application::run() - Failed to Open Cameras");    
     mCameras.Close();
     cv::destroyAllWindows();
 }
@@ -76,9 +70,10 @@ void Application::run()
 void Application::capture()
 {
     Pylon::CGrabResultPtr grabResult;
+
+    std::cout << lineBreak << std::endl << "Initializing Capture... Press ESC while focused on any window to exit." << std::endl;
     
     mCameras.StartGrabbing();       
-    std::cout << "Capture started. Press ESC while focused on any window to exit." << std::endl;
     while(mCameras.IsGrabbing())
     {
         mCameras.RetrieveResult(5000, grabResult, Pylon::TimeoutHandling_ThrowException);

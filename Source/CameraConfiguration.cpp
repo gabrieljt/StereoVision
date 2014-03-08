@@ -16,18 +16,23 @@ namespace
 CameraConfiguration::CameraConfiguration(const char* configurationFile, const int interPacketDelay, int frameTransmissionDelay)
 : mConfigurationFile(configurationFile)     
 , mInterPacketDelay(interPacketDelay)                                   
-, mFrameTransmissionDelay(frameTransmissionDelay)                             
+, mFrameTransmissionDelay(frameTransmissionDelay)    
+, mCameraName("Camera ")                         
 {
 }
 
 void CameraConfiguration::OnOpened(Pylon::CInstantCamera& camera)
 {
-    std::cout << lineBreak << std::endl; 
-    std::cout << "Attached and Opened Camera " << camera.GetCameraContext() << ": " << camera.GetDeviceInfo().GetModelName() << std::endl;         
+    mCameraName += std::to_string(camera.GetCameraContext());
+    mCameraName += ": ";
+    mCameraName += camera.GetDeviceInfo().GetModelName();
     GenApi::INodeMap& nodeMap = camera.GetNodeMap();
 
+    std::cout << lineBreak << std::endl; 
+    std::cout << "Attached and Opened " << mCameraName << std::endl;         
+
     Pylon::CFeaturePersistence::Load(mConfigurationFile, &nodeMap, true);
-    std::cout << "Loaded default configuration for Camera " << camera.GetCameraContext() << ": " << camera.GetDeviceInfo().GetModelName() << std::endl;
+    std::cout << "Loaded default configuration for " << mCameraName << std::endl;
     std::cout << std::endl;         
 
     std::cout << "Area Of Interest (AOI) Settings:" << std::endl;
@@ -48,4 +53,9 @@ void CameraConfiguration::OnOpened(Pylon::CInstantCamera& camera)
     frameTransmissionDelay->SetValue(mFrameTransmissionDelay);
     std::cout << "Inter-Packet Delay: " << interpacketDelay->GetValue() << std::endl;
     std::cout << "Frame Transmission Delay: " << frameTransmissionDelay->GetValue() << std::endl;
+}
+
+void CameraConfiguration::OnGrabStarted(Pylon::CInstantCamera& camera)
+{    
+    std::cout << mCameraName << " is Capturing." << std::endl;
 }
