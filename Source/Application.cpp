@@ -64,13 +64,24 @@ void Application::capture()
     mCameras.StartGrabbing();       
     while(mCameras.IsGrabbing())
     {
+        auto startTime = cv::getTickCount();
         // Triggers Capture Event
         mCameras.RetrieveResult(5000, grabResultPtr, Pylon::TimeoutHandling_ThrowException);
     
         // Keyboard input break with ESC key
         int key = cv::waitKey(30);
         if((key & 255) == 27)
+        {
+            /*
+            The time spent in each iteration of the main loop must be added in the FTD of each camera.
+            Doing this results in less FPS, but avoid delays when displaying the captured image.
+            This is the main trade-off: the more processing, the less frame per seconds.
+            Check Utility files for more information.
+            */
+            auto finishTime = (cv::getTickCount() - startTime) / cv::getTickFrequency();
+            std::cout << "Time spent in the last iteration (seconds): " << finishTime << std::endl;
             break;        
+        }
     }
     mCameras.StopGrabbing();
 }
