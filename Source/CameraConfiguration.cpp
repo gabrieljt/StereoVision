@@ -1,4 +1,5 @@
 #include <SV/CameraConfiguration.hpp>
+#include <SV/Utility.hpp>
 
 #include <pylon/InstantCamera.h>
 #include <pylon/FeaturePersistence.h>
@@ -7,11 +8,6 @@
 
 #include <iostream>
 
-
-namespace
-{
-    const std::string lineBreak = "================================";    
-}
 
 CameraConfiguration::CameraConfiguration(const char* configurationFile, const int interPacketDelay, int frameTransmissionDelay, std::string cameraName)
 : mConfigurationFile(configurationFile)     
@@ -25,7 +21,7 @@ void CameraConfiguration::OnOpened(Pylon::CInstantCamera& camera)
 {
     GenApi::INodeMap& nodeMap = camera.GetNodeMap();
 
-    std::cout << lineBreak << std::endl; 
+    std::cout << SV::lineBreak << std::endl; 
     std::cout << "Attached and Opened " << mCameraName << std::endl;         
 
     Pylon::CFeaturePersistence::Load(mConfigurationFile, &nodeMap, true);

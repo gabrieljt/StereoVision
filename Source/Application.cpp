@@ -1,6 +1,7 @@
 #include <SV/Application.hpp>
 #include <SV/CameraConfiguration.hpp>
 #include <SV/CameraCapture.hpp>
+#include <SV/Utility.hpp>
 
 #include <opencv2/highgui/highgui.hpp>
 
@@ -9,21 +10,11 @@
 #include <stdexcept>
 
 
-namespace
-{
-    // TODO: cross-platform configuration
-    const int MAX_NUMBER_OF_CAMERAS = 2;
-    const char* CONFIGURATION_FILE = "Config/default_linux.pfs";       // Windows: default.pfs ; Linux: default_linux.pfs
-    const int INTER_PACKET_DELAY = 8192;                               // Windows: 9018 ; Linux: 8192
-    const int FRAME_TRANSMISSION_DELAY = 4096;                         // Windows: 6233 ; Linux: 4096
-    const std::string lineBreak = "================================";    
-}
-
 Application::Application()
 : mAutoInitTerm()
 , mTransportLayerFactory(Pylon::CTlFactory::GetInstance())
 , mDevices()
-, mCameras(MAX_NUMBER_OF_CAMERAS)
+, mCameras(SV::MAX_NUMBER_OF_CAMERAS)
 {
     std::cout << "Initializing Stereo Vision..." << std::endl;  
 
@@ -41,7 +32,7 @@ Application::Application()
         cameraName += camera.GetDeviceInfo().GetModelName();
         // Register Camera's Configuration and Capture Events
         camera.RegisterConfiguration(
-            new CameraConfiguration(CONFIGURATION_FILE, INTER_PACKET_DELAY, FRAME_TRANSMISSION_DELAY * (int) (i + 1), cameraName), 
+            new CameraConfiguration(SV::CONFIGURATION_FILE, SV::INTER_PACKET_DELAY, SV::FRAME_TRANSMISSION_DELAY * (int) (i + 1), cameraName), 
             Pylon::RegistrationMode_ReplaceAll, 
             Pylon::Cleanup_Delete
         );
@@ -68,7 +59,7 @@ void Application::capture()
 {
     Pylon::CGrabResultPtr grabResultPtr;
 
-    std::cout << lineBreak << std::endl << "Initializing Capture... Press ESC while focused on any window to exit." << std::endl;
+    std::cout << SV::lineBreak << std::endl << "Initializing Capture... Press ESC while focused on any window to exit." << std::endl;
     
     mCameras.StartGrabbing();       
     while(mCameras.IsGrabbing())
