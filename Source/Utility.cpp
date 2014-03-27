@@ -1,6 +1,7 @@
 #include <SV/Utility.hpp>
 
 #include <ctime>
+#include <iostream>
 
 
 // TODO: cross-platform configuration
@@ -27,7 +28,7 @@ const std::string	SV::NOT_CALIBRATED = "NOT_CALIBRATED";
 
 /* Other Parameters */
 const std::string   SV::lineBreak = "================================\n";
-const std::string	SV::EMULATED_CAMERA = "Emulated";
+const std::string	SV::EMULATED_CAMERA = "Emulation";
 
 
 /* Functions */

@@ -21,7 +21,7 @@ class Application
         void                        capture();
         void                        scheduleCalibration();
         void                        attachDevices();
-
+        void                        registerImageEventHandlers();
         
 
     private:

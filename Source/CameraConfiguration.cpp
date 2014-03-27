@@ -22,8 +22,7 @@ void CameraConfiguration::OnOpened(Pylon::CInstantCamera& camera)
     GenApi::INodeMap& nodeMap = camera.GetNodeMap();
     Pylon::CFeaturePersistence::Load(mConfigurationFile, &nodeMap, true);
 
-    printf("%sAttached and Opened %s\nLoaded default configuration for %s\n\n", 
-        SV::lineBreak.c_str(), mCameraName.c_str(), mCameraName.c_str());
+    std::cout << SV::lineBreak << "Attached and Opened " << mCameraName << std::endl << "Loaded default configurations." << std::endl;
 
     std::cout << "Area Of Interest (AOI) Settings:" << std::endl;
     std::cout << "Width: " << GenApi::CIntegerPtr(nodeMap.GetNode("Width"))->GetValue() << std::endl;

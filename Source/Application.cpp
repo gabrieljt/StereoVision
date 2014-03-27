@@ -6,7 +6,6 @@
 
 #include <opencv2/highgui/highgui.hpp>
 
-#include <cstdio>
 #include <iostream>
 #include <fstream>
 #include <cassert>
@@ -21,11 +20,12 @@ Application::Application()
 , mCameraNames()
 , mCalibrated(false)
 {
-    printf("Initializing Stereo Vision...\n");  
+    std::cout << "Initializing Stereo Vision..." << std::endl;
     scheduleCalibration();
     attachDevices();    
     // Triggers Configuration Event (CameraConfiguration.cpp)
     mCameras.Open();
+    registerImageEventHandlers();
 }
 
 void Application::run()
@@ -39,28 +39,35 @@ void Application::run()
 
 void Application::calibrate()
 {
-    printf("%sInitializing Calibration...\n", SV::lineBreak.c_str());
+    std::cout << SV::lineBreak << "Initializing Calibration..." << std::endl;
     Pylon::CGrabResultPtr grabResultPtr;
     unsigned int n, w, h, grabCount;
     float s, d;
     do
     {
-        printf("Please enter the following parameters in a single line separated by blank spaces:\n\
-            [N]umber of stereo photos: 5 <= N <= 50\n\
-            [W]idth of chessboard corners: W >= 2\n\
-            [H]eight of chessboard corners: H >= 2; H != W\n\
-            [S]ize of chessboard square in milimiters: S >= 2.0\n\
-            [D]elay between stereo photos capture in seconds: 3.0 <= D <= 60.0\n\
-            Sample input: 20 9 6 2.3 3.0\n\
-            Your Input: ");
-        scanf("%u %u %u %f %f", &n, &w, &h, &s, &d);
+        std::cout << "Please enter the following parameters:" << std::endl;
+        std::cout << "[N]umber of stereo photos: 5 <= N <= 50" << std::endl;
+        std::cin >> n;
+        std::cout << "[W]idth of chessboard corners: W >= 2" << std::endl;
+        std::cin >> w;
+        std::cout << "[H]eight of chessboard corners: H >= 2; H != W" << std::endl;
+        std::cin >> h;
+        std::cout << "[S]ize of chessboard square in milimiters: S >= 2.0" << std::endl;
+        std::cin >> s;
+        std::cout << "[D]elay between stereo photos capture in seconds: 3.0 <= D <= 60.0" << std::endl;
+        std::cin >> d;
     } 
     while ((n < 5u || n > 50u) || (w < 2u) || (h < 2u || h == w) || (s < 2.f) || (d < 3.f || d > 60.f));
-    printf("N = %u\nW = %u\nH = %u\nS = %f\nD = %f\n", n, w, h, s, d);
+    std::cout << "N = " << n << std::endl;
+    std::cout << "W = " << w << std::endl;
+    std::cout << "H = " << h << std::endl;
+    std::cout << "S = " << s << std::endl;
+    std::cout << "D = " << d << std::endl;
 
     d *= 1000.f;
     n *= 2u;
     grabCount = 0u;
+    std::cout << "Prepare to Capture Images for Calibration!" << std::endl;
     mCameras.StartGrabbing();       
     while (mCameras.IsGrabbing() && grabCount < n)
     {
@@ -77,8 +84,10 @@ void Application::calibrate()
         ++grabCount;
     }
     mCameras.StopGrabbing();
+
+    std::cout << std::endl << "Calibrating Cameras..." << std::endl;
     auto startTime = cv::getTickCount();
-    // TODO: perform calibration on saved pair of photos
+    // TODO: perform calibration on saved stereo photos
     std::string timestamp = SV::getTimestamp();
     std::ofstream timestampFile(SV::CALIBRATION_TIMESTAMP_FILE, std::ofstream::out);
     if (timestampFile.is_open())
@@ -87,35 +96,29 @@ void Application::calibrate()
         timestampFile.close();
     }
     auto finishTime = (cv::getTickCount() - startTime) / cv::getTickFrequency();
-    printf("Calibration completed in %f seconds at %s.\n", finishTime, timestamp.c_str());    
+    mCalibrated = true;
+    std::cout << "Calibration completed in " << finishTime << " at " << timestamp << std::endl;
 
     char option;
+    bool selected;
     do 
     {
-        printf("Would you like to start Capturing? [Y]es / [N]o: ");
+        std::cout << "Would you like to start Capturing? [y]es | [n]o: ";
         std::cin >> option;
+        option == 'y' || option == 'n' ? selected = true : selected = false;
     }
-    while (option != 'Y' || option != 'y' || option != 'N' || option != 'n');
+    while (!selected);
 
-    if (option == 'Y' || option == 'y')
+    if (option == 'y')
     {
-        // Register Capture Event for cameras
-        for (size_t i = 0; i < mDevices.size(); ++i)
-        {
-            mCameras[i].RegisterImageEventHandler
-            (
-                new CameraCapture(mCameraNames[i]),
-                Pylon::RegistrationMode_ReplaceAll,
-                Pylon::Cleanup_Delete
-            );
-        }
+        registerImageEventHandlers();
         capture();
     }
 }
 
 void Application::capture()
 {
-    printf("%sInitializing Capture... Press ESC while focused on any window to exit.\n", SV::lineBreak.c_str());
+    std::cout << SV::lineBreak << "Initializing Capture... Press ESC while focused on any window to exit." << std::endl;
     Pylon::CGrabResultPtr grabResultPtr;
     
     mCameras.StartGrabbing();       
@@ -136,7 +139,7 @@ void Application::capture()
             Check Utility files for more information.
             */
             auto finishTime = (cv::getTickCount() - startTime) / cv::getTickFrequency();
-            printf("Spent %f seconds in the last iteration.\n", finishTime);
+            std::cout << "Spent " << finishTime << " seconds in the last iteration." << std::endl;
             break;        
         }
     }
@@ -158,14 +161,16 @@ void Application::scheduleCalibration()
     else
     {
         char option;
+        bool selected;
         do 
         {
-            printf("Last calibration performed at %s. Would you like to calibrate again? [Y]es / [N]o: ", timestamp.c_str());
-            std::cin >> option;
+            printf("Last calibration performed at %s. Would you like to calibrate again? [y]es | [n]o:\n", timestamp.c_str());
+            scanf("%c", &option);
+            option == 'y' || option == 'n' ? selected = true : selected = false;
         }
-        while (option != 'Y' || option != 'y' || option != 'N' || option != 'n');
+        while (!selected);
     
-        if (option == 'Y' || option == 'y')
+        if (option == 'y')
             printf("Scheduling calibration...\n");            
         else
         {
@@ -191,31 +196,37 @@ void Application::attachDevices()
         cameraModel += camera.GetDeviceInfo().GetModelName();
         cameraName += cameraModel;
         mCameraNames.push_back(cameraName);
-        // Register Camera's Configuration and Capture Events
-        if (cameraModel != SV::EMULATED_CAMERA)            
+        // Register Camera's Configuration
+        if (cameraModel != SV::EMULATED_CAMERA)
         {
             camera.RegisterConfiguration
             (
                 new CameraConfiguration(SV::CONFIGURATION_FILE, SV::INTER_PACKET_DELAY, SV::FRAME_TRANSMISSION_DELAY * (int) (i + 1), cameraName), 
                 Pylon::RegistrationMode_ReplaceAll, 
                 Pylon::Cleanup_Delete
-            );        
-            
-            mCalibrated ?
-                camera.RegisterImageEventHandler
-                (
-                    new CameraCapture(cameraName),
-                    Pylon::RegistrationMode_Append,
-                    Pylon::Cleanup_Delete
-                )
-            :
-                camera.RegisterImageEventHandler
-                (
-                    new CameraCalibration(cameraName),
-                    Pylon::RegistrationMode_Append,
-                    Pylon::Cleanup_Delete
-                )
-            ;
+            );           
         }
+    }    
+}
+
+void Application::registerImageEventHandlers()
+{
+    for (size_t i = 0; i < mDevices.size(); ++i)
+    {
+        mCalibrated ?
+            mCameras[i].RegisterImageEventHandler
+            (
+                new CameraCapture(mCameraNames[i]),
+                Pylon::RegistrationMode_ReplaceAll,
+                Pylon::Cleanup_Delete
+            )
+        :
+            mCameras[i].RegisterImageEventHandler
+            (
+                new CameraCalibration(mCameraNames[i]),
+                Pylon::RegistrationMode_ReplaceAll,
+                Pylon::Cleanup_Delete
+            )
+        ; 
     }
 }

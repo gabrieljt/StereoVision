@@ -8,7 +8,6 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include <cstdio>
 #include <iostream>
 #include <fstream>
 
@@ -17,7 +16,7 @@ CameraCalibration::CameraCalibration(std::string cameraName)
 : mCameraName(cameraName)
 , mPhotosTaken(0u)
 {
-	cv::namedWindow(mCameraName, CV_WINDOW_AUTOSIZE);
+	//cv::namedWindow(mCameraName, CV_WINDOW_AUTOSIZE);
 }
 
 void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylon::CGrabResultPtr& grabResultPtr)
@@ -41,8 +40,8 @@ void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylo
         else if (cameraContextValue == 1)
           	imagePath += SV::CALIBRATION_IMAGE_RIGHT;
 
-     	cv::imwrite(imagePath, image);
-     	printf("Photo %s saved.\n", imagePath.c_str());
+     	cv::imwrite(imagePath, image);        
+        std::cout << "Photo " << imagePath << " saved." << std::endl;
     }
     else
     {
