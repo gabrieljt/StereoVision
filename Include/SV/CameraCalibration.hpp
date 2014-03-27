@@ -23,7 +23,7 @@ class CameraCalibration : public Pylon::CImageEventHandler
 
 	private:
 		std::string		mCameraName;
-		unsigned int 	mPhotosTaken;		
+		unsigned int 	mPhotosCaptured;		
 };
 
 #endif // SV_CAMERACALIBRATION_HPP

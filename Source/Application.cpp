@@ -45,16 +45,16 @@ void Application::calibrate()
     float s, d;
     do
     {
-        std::cout << "Please enter the following parameters:" << std::endl;
-        std::cout << "[N]umber of stereo photos: 5 <= N <= 50" << std::endl;
+        std::cout << "Please enter the following parameters:";
+        std::cout << "[N]umber of stereo photos (5 <= N <= 50): ";
         std::cin >> n;
-        std::cout << "[W]idth of chessboard corners: W >= 2" << std::endl;
+        std::cout << "[W]idth of chessboard corners (W >= 2): ";
         std::cin >> w;
-        std::cout << "[H]eight of chessboard corners: H >= 2; H != W" << std::endl;
+        std::cout << "[H]eight of chessboard corners (H >= 2 & H != W): ";
         std::cin >> h;
-        std::cout << "[S]ize of chessboard square in milimiters: S >= 2.0" << std::endl;
+        std::cout << "[S]ize of chessboard square in milimiters (S >= 2.0): ";
         std::cin >> s;
-        std::cout << "[D]elay between stereo photos capture in seconds: 3.0 <= D <= 60.0" << std::endl;
+        std::cout << "[D]elay between stereo photos capture in seconds (3.0 <= D <= 60.0): ";
         std::cin >> d;
     } 
     while ((n < 5u || n > 50u) || (w < 2u) || (h < 2u || h == w) || (s < 2.f) || (d < 3.f || d > 60.f));
@@ -72,13 +72,8 @@ void Application::calibrate()
     while (mCameras.IsGrabbing() && grabCount < n)
     {
         if (grabCount % 2u == 0u)
-        {
-            // Keyboard input break with ESC key
-            int key = cv::waitKey(d);
-            if((key & 255) == 27)
-                break;        
-        }
-
+            cv::waitKey(d);
+            
         // Triggers Calibration Event
         mCameras.RetrieveResult(5000, grabResultPtr, Pylon::TimeoutHandling_ThrowException);
         ++grabCount;
@@ -157,24 +152,24 @@ void Application::scheduleCalibration()
     }    
 
     if (timestamp == SV::NOT_CALIBRATED || timestamp == "")
-        printf("Cameras have never been calibrated. Scheduling calibration...\n");
+        std::cout << "Cameras have never been calibrated. Scheduling calibration..." << std::endl;
     else
     {
         char option;
         bool selected;
         do 
         {
-            printf("Last calibration performed at %s. Would you like to calibrate again? [y]es | [n]o:\n", timestamp.c_str());
-            scanf("%c", &option);
+            std::cout << "Last calibration performed at " << timestamp << " . Would you like to calibrate again? [y]es | [n]o: ";
+            std::cin >> option;
             option == 'y' || option == 'n' ? selected = true : selected = false;
         }
         while (!selected);
     
         if (option == 'y')
-            printf("Scheduling calibration...\n");            
+            std::cout << "Scheduling calibration..." << std::endl;
         else
         {
-            printf("Using calibration performed at %s.\n", timestamp.c_str());
+            std::cout << "Using calibration performed at " << timestamp << std::endl;
             mCalibrated = true;
         }
     }

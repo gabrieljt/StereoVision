@@ -14,7 +14,7 @@
 
 CameraCalibration::CameraCalibration(std::string cameraName)
 : mCameraName(cameraName)
-, mPhotosTaken(0u)
+, mPhotosCaptured(0u)
 {
 	//cv::namedWindow(mCameraName, CV_WINDOW_AUTOSIZE);
 }
@@ -27,12 +27,12 @@ void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylo
         auto image = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC1, grabResultPtr->GetBuffer());
         auto cameraContextValue = grabResultPtr->GetCameraContext();             
         std::string imagePath(SV::CALIBRATION_IMAGES_PATH);
-        if (mPhotosTaken < 10u)
+        if (mPhotosCaptured < 10u)
             imagePath += "0";
-        imagePath += std::to_string(mPhotosTaken);        
+        imagePath += std::to_string(mPhotosCaptured);        
         
         // TODO: save image only if found chessboard corners
-        ++mPhotosTaken;        
+        ++mPhotosCaptured;        
         // Left Image
         if (cameraContextValue == 0)
            	imagePath += SV::CALIBRATION_IMAGE_LEFT;
@@ -41,7 +41,7 @@ void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylo
           	imagePath += SV::CALIBRATION_IMAGE_RIGHT;
 
      	cv::imwrite(imagePath, image);        
-        std::cout << "Photo " << imagePath << " saved." << std::endl;
+        std::cout << "Photo " << imagePath << " saved. " << mCameraName << " captured " << mPhotosCaptured << " photos." << std::endl;
     }
     else
     {
