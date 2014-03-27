@@ -19,7 +19,6 @@ class CameraConfiguration : public Pylon::CConfigurationEventHandler
                             CameraConfiguration(const char* configurationFile, const int interPacketDelay, int frameTransmissionDelay, std::string cameraName);
         void                OnOpened(Pylon::CInstantCamera& camera);
         void                OnGrabStarted(Pylon::CInstantCamera& camera);
-        
 
     private:
         const char*         mConfigurationFile;

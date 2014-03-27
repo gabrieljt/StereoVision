@@ -7,14 +7,11 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include <iostream>
-
 
 CameraCapture::CameraCapture(std::string cameraName)
 : mCameraName(cameraName)
 {
     cv::namedWindow(mCameraName, CV_WINDOW_AUTOSIZE);
-    // TODO: load calibration parameters
 }
 
 void CameraCapture::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylon::CGrabResultPtr& grabResultPtr)

@@ -17,13 +17,11 @@ namespace Pylon
 class CameraCapture : public Pylon::CImageEventHandler
 {
     public:
-    					CameraCapture(std::string cameraName);
-
-        virtual void    OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylon::CGrabResultPtr& grabResultPtr);
-
+                            CameraCapture(std::string cameraName);
+        virtual void        OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylon::CGrabResultPtr& grabResultPtr);
 
     private:
-        std::string		mCameraName;
+        const std::string   mCameraName;
 };
 
 #endif // SV_CAMERACAPTURE_HPP

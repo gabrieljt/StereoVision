@@ -5,9 +5,6 @@
 #include <pylon/TlFactory.h>
 #include <pylon/InstantCameraArray.h>
 
-#include <vector>
-#include <string>
-
 
 class Application
 {
@@ -15,19 +12,14 @@ class Application
                                     Application();
         void                        run();
 
-
     private:
-        void                        calibrate();
         void                        capture();
-        
 
     private:
         Pylon::PylonAutoInitTerm    mAutoInitTerm;
         Pylon::CTlFactory&          mTransportLayerFactory;
         Pylon::DeviceInfoList_t     mDevices;
-        Pylon::CInstantCameraArray  mCameras;   
-        std::vector<std::string>    mCameraNames; 
-        bool                        mCalibrated;
+        Pylon::CInstantCameraArray  mCameras;              
 };
 
 #endif // SV_APPLICATION_HPP

@@ -16,7 +16,6 @@ include_directories("${PROJECT_SOURCE_DIR}/Include/")
 # Define Executable Source and Headers
 set(SOURCE
         ${PROJECT_SOURCE_DIR}/Source/Application.cpp
-        ${PROJECT_SOURCE_DIR}/Source/CameraCalibration.cpp
         ${PROJECT_SOURCE_DIR}/Source/CameraCapture.cpp
         ${PROJECT_SOURCE_DIR}/Source/CameraConfiguration.cpp
         ${PROJECT_SOURCE_DIR}/Source/Main.cpp
@@ -25,7 +24,6 @@ set(SOURCE
 
 set(HEADERS
         ${PROJECT_SOURCE_DIR}/Include/SV/Application.hpp
-        ${PROJECT_SOURCE_DIR}/Include/SV/CameraCalibration.hpp
         ${PROJECT_SOURCE_DIR}/Include/SV/CameraCapture.hpp
         ${PROJECT_SOURCE_DIR}/Include/SV/CameraConfiguration.hpp
         ${PROJECT_SOURCE_DIR}/Include/SV/Utility.hpp

@@ -21,7 +21,7 @@ void CameraConfiguration::OnOpened(Pylon::CInstantCamera& camera)
 {
     GenApi::INodeMap& nodeMap = camera.GetNodeMap();
 
-    std::cout << SV::lineBreak;
+    std::cout << SV::lineBreak << std::endl; 
     std::cout << "Attached and Opened " << mCameraName << std::endl;         
 
     Pylon::CFeaturePersistence::Load(mConfigurationFile, &nodeMap, true);
