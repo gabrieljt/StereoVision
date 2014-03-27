@@ -1,7 +1,8 @@
 #include <SV/Utility.hpp>
 
-#include <ctime>
 #include <iostream>
+#include <fstream>
+#include <ctime>
 
 
 // TODO: cross-platform configuration
@@ -40,4 +41,28 @@ std::string SV::getTimestamp()
 	time (&rawtime);
 	timeinfo = localtime (&rawtime);
 	return asctime(timeinfo);
+}
+
+std::string SV::loadCalibrationTimestampFile()
+{
+	std::string timestamp;
+    std::ifstream timestampFile(SV::CALIBRATION_TIMESTAMP_FILE, std::ifstream::in);
+    if (timestampFile.is_open())
+    {
+        std::getline(timestampFile, timestamp);
+        timestampFile.close();
+    }    
+    
+    return timestamp;
+}
+
+void SV::saveCalibrationTimestampFile()
+{
+	std::string timestamp = SV::getTimestamp();
+    std::ofstream timestampFile(SV::CALIBRATION_TIMESTAMP_FILE, std::ofstream::out);
+    if (timestampFile.is_open())
+    {
+        timestampFile << timestamp;
+        timestampFile.close();
+    }
 }

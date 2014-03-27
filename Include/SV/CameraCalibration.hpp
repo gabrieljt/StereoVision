@@ -5,6 +5,7 @@
 #include <pylon/ImageEventHandler.h>
 
 #include <string>
+#include <mutex>
 
 
 namespace Pylon
@@ -16,14 +17,14 @@ namespace Pylon
 class CameraCalibration : public Pylon::CImageEventHandler
 {
 	public:
-						CameraCalibration(std::string cameraName);
+						CameraCalibration(std::string cameraName, unsigned int* grabCountPtr);
 
 		virtual void	OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylon::CGrabResultPtr& grabResultPtr);
 
 
 	private:
 		std::string		mCameraName;
-		unsigned int 	mPhotosCaptured;		
+		unsigned int* 	mGrabCountPtr;		
 };
 
 #endif // SV_CAMERACALIBRATION_HPP

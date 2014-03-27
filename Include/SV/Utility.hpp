@@ -30,6 +30,8 @@ namespace SV
 
     /* Functions */
     std::string                 getTimestamp();
+    std::string                 loadCalibrationTimestampFile();
+    void                        saveCalibrationTimestampFile();
 }
 
 #endif // SV_UTILITY_HPP

@@ -21,7 +21,8 @@ class Application
         void                        capture();
         void                        scheduleCalibration();
         void                        attachDevices();
-        void                        registerImageEventHandlers();
+        void                        registerCameraCalibration(unsigned int* grabCountPtr);
+        void                        registerCameraCapture();
         
 
     private:

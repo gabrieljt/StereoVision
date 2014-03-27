@@ -6,8 +6,8 @@
 
 #include <opencv2/highgui/highgui.hpp>
 
+#include <memory>
 #include <iostream>
-#include <fstream>
 #include <cassert>
 #include <stdexcept>
 
@@ -25,7 +25,6 @@ Application::Application()
     attachDevices();    
     // Triggers Configuration Event (CameraConfiguration.cpp)
     mCameras.Open();
-    registerImageEventHandlers();
 }
 
 void Application::run()
@@ -39,9 +38,9 @@ void Application::run()
 
 void Application::calibrate()
 {
-    std::cout << SV::lineBreak << "Initializing Calibration..." << std::endl;
+    std::cout << SV::lineBreak << "Initializing Stereo Calibration Procedure..." << std::endl;
     Pylon::CGrabResultPtr grabResultPtr;
-    unsigned int n, w, h, grabCount;
+    unsigned int n, w, h;
     float s, d;
     do
     {
@@ -65,34 +64,29 @@ void Application::calibrate()
     std::cout << "D = " << d << std::endl;
 
     d *= 1000.f;
-    n *= 2u;
-    grabCount = 0u;
+    std::unique_ptr<unsigned int> grabCountPtr(new unsigned int);
+    auto grabCount = grabCountPtr.get();
+    *grabCount = 0u;
+    registerCameraCalibration(grabCount);    
     std::cout << "Prepare to Capture Images for Calibration!" << std::endl;
-    mCameras.StartGrabbing();       
-    while (mCameras.IsGrabbing() && grabCount < n)
-    {
-        if (grabCount % 2u == 0u)
-            cv::waitKey(d);
-            
+    // Cameras Synchronization: Round-Robin Strategy
+    mCameras.StartGrabbing(Pylon::GrabStrategy_UpcomingImage);       
+    while (mCameras.IsGrabbing() && *grabCount < n)
+    {            
         // Triggers Calibration Event
-        mCameras.RetrieveResult(5000, grabResultPtr, Pylon::TimeoutHandling_ThrowException);
-        ++grabCount;
+        mCameras.RetrieveResult(Pylon::INFINITE, grabResultPtr, Pylon::TimeoutHandling_ThrowException);
     }
     mCameras.StopGrabbing();
-
+    std::cout << "Stereo Photos Captured: " << *grabCount << "/" << n << std::endl;    
+    
     std::cout << std::endl << "Calibrating Cameras..." << std::endl;
     auto startTime = cv::getTickCount();
-    // TODO: perform calibration on saved stereo photos
-    std::string timestamp = SV::getTimestamp();
-    std::ofstream timestampFile(SV::CALIBRATION_TIMESTAMP_FILE, std::ofstream::out);
-    if (timestampFile.is_open())
-    {
-        timestampFile << timestamp;
-        timestampFile.close();
-    }
+    // TODO: perform calibration on saved stereo photos (fork exec?)
     auto finishTime = (cv::getTickCount() - startTime) / cv::getTickFrequency();
+
+    SV::saveCalibrationTimestampFile();    
     mCalibrated = true;
-    std::cout << "Calibration completed in " << finishTime << " at " << timestamp << std::endl;
+    std::cout << "Calibration completed in " << finishTime << " at " << SV::loadCalibrationTimestampFile() << std::endl;
 
     char option;
     bool selected;
@@ -104,16 +98,14 @@ void Application::calibrate()
     }
     while (!selected);
 
-    if (option == 'y')
-    {
-        registerImageEventHandlers();
-        capture();
-    }
+    if (option == 'y')    
+        capture();    
 }
 
 void Application::capture()
 {
     std::cout << SV::lineBreak << "Initializing Capture... Press ESC while focused on any window to exit." << std::endl;
+    registerCameraCapture();    
     Pylon::CGrabResultPtr grabResultPtr;
     
     mCameras.StartGrabbing();       
@@ -143,13 +135,7 @@ void Application::capture()
 
 void Application::scheduleCalibration()
 {
-    std::string timestamp;
-    std::ifstream timestampFile(SV::CALIBRATION_TIMESTAMP_FILE, std::ifstream::in);
-    if (timestampFile.is_open())
-    {
-        std::getline(timestampFile, timestamp);
-        timestampFile.close();
-    }    
+    std::string timestamp = SV::loadCalibrationTimestampFile();
 
     if (timestamp == SV::NOT_CALIBRATED || timestamp == "")
         std::cout << "Cameras have never been calibrated. Scheduling calibration..." << std::endl;
@@ -187,9 +173,8 @@ void Application::attachDevices()
         mCameras[i].Attach(mTransportLayerFactory.CreateDevice(mDevices[i]));
         Pylon::CInstantCamera &camera = mCameras[i];
         // Define Camera Name for logging and OpenCV NamedWindow
-        cameraName = "Camera " + std::to_string(i) + ": ";
-        cameraModel += camera.GetDeviceInfo().GetModelName();
-        cameraName += cameraModel;
+        i % 2 == 0 ? cameraName = "Left Camera" : cameraName = "Right Camera";
+        cameraModel += camera.GetDeviceInfo().GetModelName();        
         mCameraNames.push_back(cameraName);
         // Register Camera's Configuration
         if (cameraModel != SV::EMULATED_CAMERA)
@@ -204,24 +189,28 @@ void Application::attachDevices()
     }    
 }
 
-void Application::registerImageEventHandlers()
+void Application::registerCameraCalibration(unsigned int* grabCount)
 {
     for (size_t i = 0; i < mDevices.size(); ++i)
     {
-        mCalibrated ?
-            mCameras[i].RegisterImageEventHandler
-            (
-                new CameraCapture(mCameraNames[i]),
-                Pylon::RegistrationMode_ReplaceAll,
-                Pylon::Cleanup_Delete
-            )
-        :
-            mCameras[i].RegisterImageEventHandler
-            (
-                new CameraCalibration(mCameraNames[i]),
-                Pylon::RegistrationMode_ReplaceAll,
-                Pylon::Cleanup_Delete
-            )
-        ; 
+        mCameras[i].RegisterImageEventHandler
+        (
+            new CameraCalibration(mCameraNames[i], grabCount),
+            Pylon::RegistrationMode_ReplaceAll,
+            Pylon::Cleanup_Delete
+        );
+    }
+}
+
+void Application::registerCameraCapture()
+{
+    for (size_t i = 0; i < mDevices.size(); ++i)
+    {
+        mCameras[i].RegisterImageEventHandler
+        (
+            new CameraCapture(mCameraNames[i]),
+            Pylon::RegistrationMode_ReplaceAll,
+            Pylon::Cleanup_Delete
+        );
     }
 }

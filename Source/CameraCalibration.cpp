@@ -12,9 +12,9 @@
 #include <fstream>
 
 
-CameraCalibration::CameraCalibration(std::string cameraName)
+CameraCalibration::CameraCalibration(std::string cameraName, unsigned int* grabCountPtr)
 : mCameraName(cameraName)
-, mPhotosCaptured(0u)
+, mGrabCountPtr(grabCountPtr)
 {
 	//cv::namedWindow(mCameraName, CV_WINDOW_AUTOSIZE);
 }
@@ -23,16 +23,14 @@ void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylo
 {
 	if (grabResultPtr->GrabSucceeded())
     {        
-        // OpenCV image CV_8U: 8-bits, 1 channel
+        // OpenCV image CV_8U: 8-bits, 1 channel        
         auto image = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC1, grabResultPtr->GetBuffer());
         auto cameraContextValue = grabResultPtr->GetCameraContext();             
         std::string imagePath(SV::CALIBRATION_IMAGES_PATH);
-        if (mPhotosCaptured < 10u)
+        if (*mGrabCountPtr < 10u)
             imagePath += "0";
-        imagePath += std::to_string(mPhotosCaptured);        
+        imagePath += std::to_string(*mGrabCountPtr);        
         
-        // TODO: save image only if found chessboard corners
-        ++mPhotosCaptured;        
         // Left Image
         if (cameraContextValue == 0)
            	imagePath += SV::CALIBRATION_IMAGE_LEFT;
@@ -40,8 +38,15 @@ void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylo
         else if (cameraContextValue == 1)
           	imagePath += SV::CALIBRATION_IMAGE_RIGHT;
 
-     	cv::imwrite(imagePath, image);        
-        std::cout << "Photo " << imagePath << " saved. " << mCameraName << " captured " << mPhotosCaptured << " photos." << std::endl;
+        // TODO: save image only if found chessboard corners
+        bool foundChessboardCorners = true;
+        if (foundChessboardCorners)
+        {
+            cv::imwrite(imagePath, image);                    
+            std::cout << "Photo [" << imagePath << "] saved." << std::endl;
+            if (cameraContextValue == 1)
+                *mGrabCountPtr += 1u;
+        }
     }
     else
     {
