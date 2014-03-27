@@ -67,6 +67,7 @@ target_link_libraries(${EXECUTABLE_NAME} ${PYLON_LIBRARIES})
 # Install Target
 install(TARGETS ${EXECUTABLE_NAME} DESTINATION .)
 file(COPY Config DESTINATION .)
+file(COPY Modules DESTINATION .)
 
 # CPack packaging
 include(InstallRequiredSystemLibraries)

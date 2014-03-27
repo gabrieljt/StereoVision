@@ -19,6 +19,7 @@ Application::Application()
 , mCameras(SV::MAX_NUMBER_OF_CAMERAS)
 , mCameraNames()
 , mCalibrated(false)
+, mEmulated(false)
 {
     std::cout << "Initializing Stereo Vision..." << std::endl;
     scheduleCalibration();
@@ -178,7 +179,7 @@ void Application::attachDevices()
         mCameraNames.push_back(cameraName);
         // Register Camera's Configuration
         if (cameraModel != SV::EMULATED_CAMERA)
-        {
+        {            
             camera.RegisterConfiguration
             (
                 new CameraConfiguration(SV::CONFIGURATION_FILE, SV::INTER_PACKET_DELAY, SV::FRAME_TRANSMISSION_DELAY * (int) (i + 1), cameraName), 
@@ -186,6 +187,8 @@ void Application::attachDevices()
                 Pylon::Cleanup_Delete
             );           
         }
+        else
+            mEmulated = true;
     }    
 }
 
@@ -195,7 +198,7 @@ void Application::registerCameraCalibration(unsigned int* grabCount)
     {
         mCameras[i].RegisterImageEventHandler
         (
-            new CameraCalibration(mCameraNames[i], grabCount),
+            new CameraCalibration(mCameraNames[i], grabCount, mEmulated),
             Pylon::RegistrationMode_ReplaceAll,
             Pylon::Cleanup_Delete
         );
@@ -208,7 +211,7 @@ void Application::registerCameraCapture()
     {
         mCameras[i].RegisterImageEventHandler
         (
-            new CameraCapture(mCameraNames[i]),
+            new CameraCapture(mCameraNames[i], mEmulated),
             Pylon::RegistrationMode_ReplaceAll,
             Pylon::Cleanup_Delete
         );

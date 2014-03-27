@@ -32,6 +32,7 @@ class Application
         Pylon::CInstantCameraArray  mCameras;   
         std::vector<std::string>    mCameraNames; 
         bool                        mCalibrated;
+        bool                        mEmulated;
 };
 
 #endif // SV_APPLICATION_HPP

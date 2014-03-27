@@ -12,9 +12,10 @@
 #include <fstream>
 
 
-CameraCalibration::CameraCalibration(std::string cameraName, unsigned int* grabCountPtr)
+CameraCalibration::CameraCalibration(std::string cameraName, unsigned int* grabCountPtr, bool emulated)
 : mCameraName(cameraName)
 , mGrabCountPtr(grabCountPtr)
+, mEmulated(emulated)
 {
 	//cv::namedWindow(mCameraName, CV_WINDOW_AUTOSIZE);
 }
@@ -24,7 +25,8 @@ void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylo
 	if (grabResultPtr->GrabSucceeded())
     {        
         // OpenCV image CV_8U: 8-bits, 1 channel        
-        auto image = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC1, grabResultPtr->GetBuffer());
+        cv::Mat image;
+        mEmulated ? image = cv::imread(SV::EMULATED_IMAGE) : image = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC1, grabResultPtr->GetBuffer());
         auto cameraContextValue = grabResultPtr->GetCameraContext();             
         std::string imagePath(SV::CALIBRATION_IMAGES_PATH);
         if (*mGrabCountPtr < 10u)

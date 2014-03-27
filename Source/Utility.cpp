@@ -21,7 +21,9 @@ const int           SV::FRAME_TRANSMISSION_DELAY = 4096 + SV::MAIN_LOOP_ITERATIO
 
 /* Calibration Parameters */
 const std::string	SV::CALIBRATION_TIMESTAMP_FILE = "Config/Calibration/timestamp.txt";
-const std::string	SV::CALIBRATION_IMAGES_PATH = "Config/Calibration/Images/";
+const std::string   SV::CALIBRATION_IMAGES_FILE = "Modules/StereoCalibration/list.txt";
+const std::string	SV::CALIBRATION_IMAGES_PATH = "Modules/StereoCalibration/Images/";
+const std::string   SV::CALIBRATION_IMAGES_RELATIVE_PATH = "../Images/";
 const std::string	SV::CALIBRATION_IMAGE_LEFT = "left.ppm";
 const std::string	SV::CALIBRATION_IMAGE_RIGHT = "right.ppm";
 const std::string	SV::NOT_CALIBRATED = "NOT_CALIBRATED";
@@ -30,6 +32,7 @@ const std::string	SV::NOT_CALIBRATED = "NOT_CALIBRATED";
 /* Other Parameters */
 const std::string   SV::lineBreak = "================================\n";
 const std::string	SV::EMULATED_CAMERA = "Emulation";
+const std::string   SV::EMULATED_IMAGE = SV::CALIBRATION_IMAGES_PATH + "checkerboard.png";
 
 
 /* Functions */

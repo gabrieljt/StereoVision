@@ -10,8 +10,9 @@
 #include <iostream>
 
 
-CameraCapture::CameraCapture(std::string cameraName)
+CameraCapture::CameraCapture(std::string cameraName, bool emulated)
 : mCameraName(cameraName)
+, mEmulated(emulated)
 {
     cv::namedWindow(mCameraName, CV_WINDOW_AUTOSIZE);
     // TODO: load calibration parameters
