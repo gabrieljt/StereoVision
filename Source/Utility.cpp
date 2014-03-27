@@ -27,6 +27,7 @@ const std::string	SV::NOT_CALIBRATED = "NOT_CALIBRATED";
 
 /* Other Parameters */
 const std::string   SV::lineBreak = "================================\n";
+const std::string	SV::EMULATED_CAMERA = "Emulated";
 
 
 /* Functions */

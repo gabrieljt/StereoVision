@@ -25,6 +25,7 @@ namespace SV
 
     /* Other Parameters */
     extern const std::string	lineBreak;
+    extern const std::string    EMULATED_CAMERA;
 
 
     /* Functions */

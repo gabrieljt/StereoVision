@@ -19,6 +19,9 @@ class Application
     private:
         void                        calibrate();
         void                        capture();
+        void                        scheduleCalibration();
+        void                        attachDevices();
+
         
 
     private:
