@@ -6,6 +6,7 @@
 
 #include <string>
 #include <mutex>
+#include <fstream>
 
 
 namespace Pylon
@@ -17,7 +18,7 @@ namespace Pylon
 class CameraCalibration : public Pylon::CImageEventHandler
 {
 	public:
-						CameraCalibration(std::string cameraName, unsigned int* grabCountPtr, bool emulated);
+						CameraCalibration(std::string cameraName, unsigned int* grabCountPtr, std::ofstream* imageListFilePtr, bool emulated);
 
 		virtual void	OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylon::CGrabResultPtr& grabResultPtr);
 
@@ -25,6 +26,7 @@ class CameraCalibration : public Pylon::CImageEventHandler
 	private:
 		std::string		mCameraName;
 		unsigned int* 	mGrabCountPtr;		
+		std::ofstream*	mImageListFilePtr;
 		bool			mEmulated;
 };
 

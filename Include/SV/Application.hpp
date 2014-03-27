@@ -21,7 +21,7 @@ class Application
         void                        capture();
         void                        scheduleCalibration();
         void                        attachDevices();
-        void                        registerCameraCalibration(unsigned int* grabCountPtr);
+        void                        registerCameraCalibration(unsigned int* grabCountPtr, std::ofstream* imageListFile);
         void                        registerCameraCapture();
         
 

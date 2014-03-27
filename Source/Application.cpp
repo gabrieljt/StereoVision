@@ -6,8 +6,9 @@
 
 #include <opencv2/highgui/highgui.hpp>
 
-#include <memory>
 #include <iostream>
+#include <memory>
+#include <fstream>
 #include <cassert>
 #include <stdexcept>
 
@@ -68,7 +69,9 @@ void Application::calibrate()
     std::unique_ptr<unsigned int> grabCountPtr(new unsigned int);
     auto grabCount = grabCountPtr.get();
     *grabCount = 0u;
-    registerCameraCalibration(grabCount);    
+    std::unique_ptr<std::ofstream> imageListFilePtr(new std::ofstream(SV::CALIBRATION_IMAGES_FILE, std::ofstream::out));
+    auto imageListFile = imageListFilePtr.get();
+    registerCameraCalibration(grabCount, imageListFile);    
     std::cout << "Prepare to Capture Images for Calibration!" << std::endl;
     // Cameras Synchronization: Round-Robin Strategy
     mCameras.StartGrabbing(Pylon::GrabStrategy_UpcomingImage);       
@@ -78,6 +81,7 @@ void Application::calibrate()
         mCameras.RetrieveResult(Pylon::INFINITE, grabResultPtr, Pylon::TimeoutHandling_ThrowException);
     }
     mCameras.StopGrabbing();
+    imageListFile->close();
     std::cout << "Stereo Photos Captured: " << *grabCount << "/" << n << std::endl;    
     
     std::cout << std::endl << "Calibrating Cameras..." << std::endl;
@@ -192,13 +196,13 @@ void Application::attachDevices()
     }    
 }
 
-void Application::registerCameraCalibration(unsigned int* grabCount)
+void Application::registerCameraCalibration(unsigned int* grabCount, std::ofstream* imageListFile)
 {
     for (size_t i = 0; i < mDevices.size(); ++i)
     {
         mCameras[i].RegisterImageEventHandler
         (
-            new CameraCalibration(mCameraNames[i], grabCount, mEmulated),
+            new CameraCalibration(mCameraNames[i], grabCount, imageListFile, mEmulated),
             Pylon::RegistrationMode_ReplaceAll,
             Pylon::Cleanup_Delete
         );
