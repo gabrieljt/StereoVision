@@ -86,7 +86,7 @@ void Application::calibrate()
 
     SV::saveCalibrationTimestampFile();    
     mCalibrated = true;
-    std::cout << "Calibration completed in " << finishTime << " at " << SV::loadCalibrationTimestampFile() << std::endl;
+    std::cout << "Calibration completed in " << finishTime << " seconds at " << SV::loadCalibrationTimestampFile() << std::endl;
 
     char option;
     bool selected;
