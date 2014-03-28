@@ -86,6 +86,7 @@ void Application::calibrate()
     
     std::cout << std::endl << "Calibrating Cameras..." << std::endl;
     auto startTime = cv::getTickCount();
+    SV::forkExecStereoCalibrationModule(w, h, s);
     // TODO: perform calibration on saved stereo photos (fork exec?)
     auto finishTime = (cv::getTickCount() - startTime) / cv::getTickFrequency();
 

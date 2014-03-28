@@ -3,6 +3,11 @@
 #include <iostream>
 #include <fstream>
 #include <ctime>
+#include <cstdio>
+#include <cstdlib>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 
 // TODO: cross-platform configuration
@@ -21,11 +26,12 @@ const int           SV::FRAME_TRANSMISSION_DELAY = 4096 + SV::MAIN_LOOP_ITERATIO
 
 /* Calibration Parameters */
 const std::string	SV::CALIBRATION_TIMESTAMP_FILE = "Config/Calibration/timestamp.txt";
+const std::string   SV::CALIBRATION_BIN = "Modules/StereoCalibration/Bin/StereoCalibration";
 const std::string   SV::CALIBRATION_IMAGES_FILE = "Modules/StereoCalibration/list.txt";
 const std::string	SV::CALIBRATION_IMAGES_PATH = "Modules/StereoCalibration/Images/";
-const std::string   SV::CALIBRATION_IMAGES_RELATIVE_PATH = "../Images/";
 const std::string	SV::CALIBRATION_IMAGE_LEFT = "left.ppm";
 const std::string	SV::CALIBRATION_IMAGE_RIGHT = "right.ppm";
+const std::string   SV::STEREO_CALIBRATION = "StereoCalibration";
 const std::string	SV::NOT_CALIBRATED = "NOT_CALIBRATED";
 
 
@@ -68,4 +74,38 @@ void SV::saveCalibrationTimestampFile()
         timestampFile << timestamp;
         timestampFile.close();
     }
+}
+
+int SV::forkExecStereoCalibrationModule(unsigned int w, unsigned int h, float s)
+{
+    pid_t result, stereoCalibrationPID;
+    int status;
+    std::string width = std::to_string(w);
+    std::string height = std::to_string(h);
+    std::string size = std::to_string(s);
+
+    result = fork();
+
+    if (result == -1) 
+    {
+        std::cout << "SV::forkExecStereoCalibrationModule() ERROR: fork();" << std::endl;
+        return result;
+    }
+
+    /* Son Process - StereoCalibration */
+    if (result == 0)
+    {         
+        std::cout << "Executing Stereo Calibration Module..." << std::endl;
+        result = execl(SV::CALIBRATION_BIN.c_str(), SV::STEREO_CALIBRATION.c_str(), SV::CALIBRATION_IMAGES_FILE.c_str(), width.c_str(), height.c_str(), size.c_str(), NULL);
+        std::cout << "exec() failed status: " << result << std::endl;
+        if (result == -1)
+            exit(0);
+    }
+    /* Father Process - StereoVision */
+    else
+    {         
+        stereoCalibrationPID = wait(&status);
+    }
+
+    return 0;
 }

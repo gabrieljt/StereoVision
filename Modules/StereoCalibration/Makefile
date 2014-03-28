@@ -1,7 +1,7 @@
 all:
 	if test -d Bin; then echo "Compiling..."; else mkdir Bin; fi
-	g++ StereoCalibrate.cpp `pkg-config --cflags --libs opencv` -o Bin/StereoCalibrate
+	g++ StereoCalibration.cpp `pkg-config --cflags --libs opencv` -o Bin/StereoCalibration
         
 clean:
-	rm Bin/StereoCalibrate
+	rm Bin/StereoCalibration
 	rmdir Bin

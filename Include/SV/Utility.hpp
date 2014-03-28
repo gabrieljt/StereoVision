@@ -17,11 +17,12 @@ namespace SV
     
     /* Calibration Parameters */
     extern const std::string	CALIBRATION_TIMESTAMP_FILE;
+    extern const std::string    CALIBRATION_BIN;
     extern const std::string    CALIBRATION_IMAGES_FILE;
     extern const std::string    CALIBRATION_IMAGES_PATH;
-    extern const std::string    CALIBRATION_IMAGES_RELATIVE_PATH;
     extern const std::string    CALIBRATION_IMAGE_LEFT;
     extern const std::string    CALIBRATION_IMAGE_RIGHT;
+    extern const std::string    STEREO_CALIBRATION;
     extern const std::string	NOT_CALIBRATED;
 
 
@@ -35,6 +36,7 @@ namespace SV
     std::string                 getTimestamp();
     std::string                 loadCalibrationTimestampFile();
     void                        saveCalibrationTimestampFile();
+    int                         forkExecStereoCalibrationModule(unsigned int w, unsigned int h, float s);
 }
 
 #endif // SV_UTILITY_HPP

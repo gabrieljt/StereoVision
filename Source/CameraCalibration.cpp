@@ -30,25 +30,22 @@ void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylo
         mEmulated ? image = cv::imread(SV::EMULATED_IMAGE) : image = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC1, grabResultPtr->GetBuffer());
         auto cameraContextValue = grabResultPtr->GetCameraContext();             
         std::string imagePath(SV::CALIBRATION_IMAGES_PATH);
-        std::string imageName;
         if (*mGrabCountPtr < 10u)
-            imageName = "0";
-        imageName += std::to_string(*mGrabCountPtr);        
+            imagePath += "0";
+        imagePath += std::to_string(*mGrabCountPtr);        
         
         // Left Image
         if (cameraContextValue == 0)
-           	imageName += SV::CALIBRATION_IMAGE_LEFT;
+           	imagePath += SV::CALIBRATION_IMAGE_LEFT;
         // Right Image
         else if (cameraContextValue == 1)
-          	imageName += SV::CALIBRATION_IMAGE_RIGHT;
-        imagePath += imageName;
+          	imagePath += SV::CALIBRATION_IMAGE_RIGHT;
 
         // TODO: save image only if found chessboard corners
         bool foundChessboardCorners = true;
         if (foundChessboardCorners)
         {
-            *mImageListFilePtr << SV::CALIBRATION_IMAGES_RELATIVE_PATH + imageName;
-            *mImageListFilePtr << std::endl;
+            *mImageListFilePtr << imagePath << std::endl;
             cv::imwrite(imagePath, image);                    
             std::cout << "Photo [" << imagePath << "] saved." << std::endl;
             if (cameraContextValue == 1)
