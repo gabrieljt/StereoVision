@@ -40,34 +40,20 @@ find_package(OpenCV REQUIRED)
 target_link_libraries(${EXECUTABLE_NAME} ${OpenCV_LIBS})
 
 # Find Basler's Pylon SDK; TODO: improve FindPylon.cmake module for Cross-Compilation
-
-# Linux Build
 find_package(Pylon REQUIRED) 
-
-# Windows Build
-#set (PYLON_INCLUDE_DIRS $ENV{PYLON_ROOT}/include
-#			$ENV{PYLON_GENICAM_ROOT}/library/CPP/include
-#)
-
-#set (PYLON_LIBRARIES 
-#		$ENV{PYLON_ROOT}/lib/x64/PylonBase_MD_VC100.lib
-#		$ENV{PYLON_ROOT}/lib/x64/PylonGUI_MD_VC100.lib
-#		$ENV{PYLON_ROOT}/lib/x64/PylonUtility_MD_VC100.lib
-#		$ENV{PYLON_ROOT}/lib/x64/PylonBootstrapper.lib
-#		$ENV{PYLON_GENICAM_ROOT}/library/cpp/lib/win64_x64/GCBase_MD_VC100_$ENV{PYLON_GENICAM_VERSION}.lib
-#		$ENV{PYLON_GENICAM_ROOT}/library/cpp/lib/win64_x64/GenApi_MD_VC100_$ENV{PYLON_GENICAM_VERSION}.lib
-#		$ENV{PYLON_GENICAM_ROOT}/library/cpp/lib/win64_x64/MathParser_MD_VC100_$ENV{PYLON_GENICAM_VERSION}.lib
-#		$ENV{PYLON_GENICAM_ROOT}/library/cpp/lib/win64_x64/Log_MD_VC100_$ENV{PYLON_GENICAM_VERSION}.lib
-#		$ENV{PYLON_GENICAM_ROOT}/library/cpp/lib/win64_x64/Log4cpp_MD_VC100_$ENV{PYLON_GENICAM_VERSION}.lib
-#)
-
 include_directories(${PYLON_INCLUDE_DIRS})
 target_link_libraries(${EXECUTABLE_NAME} ${PYLON_LIBRARIES})
 
 # Install Target
 install(TARGETS ${EXECUTABLE_NAME} DESTINATION .)
 file(COPY Config DESTINATION .)
-file(COPY Modules DESTINATION .)
+
+# StereoCalibration Module
+set(SOURCE ${PROJECT_SOURCE_DIR}/Modules/StereoCalibration/StereoCalibration.cpp)
+set(EXECUTABLE_NAME StereoCalibration)
+add_executable(${EXECUTABLE_NAME} ${SOURCE})
+target_link_libraries(${EXECUTABLE_NAME} ${OpenCV_LIBS})
+install(TARGETS ${EXECUTABLE_NAME} DESTINATION .)
 
 # CPack packaging
 include(InstallRequiredSystemLibraries)

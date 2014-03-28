@@ -25,13 +25,12 @@ const int           SV::FRAME_TRANSMISSION_DELAY = 4096 + SV::MAIN_LOOP_ITERATIO
 
 
 /* Calibration Parameters */
+const std::string   SV::CALIBRATION_BIN = "StereoCalibration";
 const std::string	SV::CALIBRATION_TIMESTAMP_FILE = "Config/Calibration/timestamp.txt";
-const std::string   SV::CALIBRATION_BIN = "Modules/StereoCalibration/Bin/StereoCalibration";
-const std::string   SV::CALIBRATION_IMAGES_FILE = "Modules/StereoCalibration/list.txt";
-const std::string	SV::CALIBRATION_IMAGES_PATH = "Modules/StereoCalibration/Images/";
+const std::string   SV::CALIBRATION_IMAGES_FILE = "Config/Calibration/list.txt";
+const std::string	SV::CALIBRATION_IMAGES_PATH = "Config/Calibration/Images/";
 const std::string	SV::CALIBRATION_IMAGE_LEFT = "left.ppm";
 const std::string	SV::CALIBRATION_IMAGE_RIGHT = "right.ppm";
-const std::string   SV::STEREO_CALIBRATION = "StereoCalibration";
 const std::string	SV::NOT_CALIBRATED = "NOT_CALIBRATED";
 
 
@@ -96,7 +95,7 @@ int SV::forkExecStereoCalibrationModule(unsigned int w, unsigned int h, float s)
     if (result == 0)
     {         
         std::cout << "Executing Stereo Calibration Module..." << std::endl;
-        result = execl(SV::CALIBRATION_BIN.c_str(), SV::STEREO_CALIBRATION.c_str(), SV::CALIBRATION_IMAGES_FILE.c_str(), width.c_str(), height.c_str(), size.c_str(), NULL);
+        result = execl(SV::CALIBRATION_BIN.c_str(), SV::CALIBRATION_BIN.c_str(), SV::CALIBRATION_IMAGES_FILE.c_str(), width.c_str(), height.c_str(), size.c_str(), NULL);
         std::cout << "exec() failed status: " << result << std::endl;
         if (result == -1)
             exit(0);
