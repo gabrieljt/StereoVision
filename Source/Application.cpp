@@ -65,6 +65,7 @@ void Application::calibrate()
     std::cout << "S = " << s << std::endl;
     std::cout << "D = " << d << std::endl;
 
+    // Setup Variables and Shared Pointers
     d *= 1000.f;
     std::unique_ptr<unsigned int> grabCountPtr(new unsigned int);
     auto grabCount = grabCountPtr.get();
@@ -73,6 +74,7 @@ void Application::calibrate()
     auto imageListFile = imageListFilePtr.get();
     registerCameraCalibration(grabCount, imageListFile);    
     std::cout << "Prepare to Capture Images for Calibration!" << std::endl;
+    
     // Cameras Synchronization: Round-Robin Strategy
     mCameras.StartGrabbing(Pylon::GrabStrategy_UpcomingImage);       
     while (mCameras.IsGrabbing() && *grabCount < n)
@@ -82,12 +84,11 @@ void Application::calibrate()
     }
     mCameras.StopGrabbing();
     imageListFile->close();
-    std::cout << "Stereo Photos Captured: " << *grabCount << "/" << n << std::endl;    
-    
-    std::cout << std::endl << "Calibrating Cameras..." << std::endl;
+    std::cout << "Stereo Photos Captured: " << *grabCount << "/" << n << std::endl;        
+
+    // Start Stereo Calibration Module
     auto startTime = cv::getTickCount();
     SV::forkExecStereoCalibrationModule(w, h, s);
-    // TODO: perform calibration on saved stereo photos (fork exec?)
     auto finishTime = (cv::getTickCount() - startTime) / cv::getTickFrequency();
 
     SV::saveCalibrationTimestampFile();    
