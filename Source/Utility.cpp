@@ -37,7 +37,7 @@ const std::string	SV::NOT_CALIBRATED = "NOT_CALIBRATED";
 /* Other Parameters */
 const std::string   SV::lineBreak = "================================\n";
 const std::string	SV::EMULATED_CAMERA = "Emulation";
-const std::string   SV::EMULATED_IMAGE = SV::CALIBRATION_IMAGES_PATH + "checkerboard.png";
+const std::string   SV::EMULATED_IMAGE = SV::CALIBRATION_IMAGES_PATH + "checkerboard-small.png";
 
 
 /* Functions */
