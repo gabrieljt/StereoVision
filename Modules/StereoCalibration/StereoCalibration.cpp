@@ -28,6 +28,7 @@
 	Modified by Martin Peris Martorell (info@martinperis.com) in order to accept some configuration
 	parameters and store all the calibration data as xml files.
 
+    Also modified by Gabriel Trabasso in order to save the xml files in a custom path; see usage.
 */
 
 #include "cv.h"
@@ -51,7 +52,7 @@ using namespace std;
 // rectified results along with the computed disparity images.
 //
 static void
-StereoCalib(const char* imageList, int nx, int ny, int useUncalibrated, float _squareSize)
+StereoCalib(const char* imageList, int nx, int ny, int useUncalibrated, float _squareSize, char* xmlFilesPath)
 {
     int displayCorners = 1;
     int showUndistorted = 1;
@@ -266,20 +267,86 @@ StereoCalib(const char* imageList, int nx, int ny, int useUncalibrated, float _s
             cvInitUndistortRectifyMap(&_M2,&_D2,&_R2,&_P2,mx2,my2);
             
     //Save parameters
-            cvSave("M1.xml",&_M1);
-            cvSave("D1.xml",&_D1);
-            cvSave("R1.xml",&_R1);
-            cvSave("P1.xml",&_P1);
-            cvSave("M2.xml",&_M2);
-            cvSave("D2.xml",&_D2);
-            cvSave("R2.xml",&_R2);
-            cvSave("P2.xml",&_P2);
-            cvSave("Q.xml",&_Q);
-            cvSave("mx1.xml",mx1);
-            cvSave("my1.xml",my1);
-            cvSave("mx2.xml",mx2);
-            cvSave("my2.xml",my2);
+            char tmpPath[256];
 
+            strcpy(tmpPath, xmlFilesPath);
+            strcat(tmpPath, "M1.xml");
+            char pathM1[256];
+            strcpy(pathM1, tmpPath);
+
+            strcpy(tmpPath, xmlFilesPath);
+            strcat(tmpPath, "D1.xml");
+            char pathD1[256];
+            strcpy(pathD1, tmpPath);
+
+            strcpy(tmpPath, xmlFilesPath);
+            strcat(tmpPath, "R1.xml");
+            char pathR1[256];
+            strcpy(pathR1, tmpPath);
+
+            strcpy(tmpPath, xmlFilesPath);
+            strcat(tmpPath, "P1.xml");
+            char pathP1[256];
+            strcpy(pathP1, tmpPath);
+
+            strcpy(tmpPath, xmlFilesPath);
+            strcat(tmpPath, "M2.xml");
+            char pathM2[256];
+            strcpy(pathM2, tmpPath);
+
+            strcpy(tmpPath, xmlFilesPath);
+            strcat(tmpPath, "D2.xml");
+            char pathD2[256];
+            strcpy(pathD2, tmpPath);
+
+            strcpy(tmpPath, xmlFilesPath);
+            strcat(tmpPath, "R2.xml");
+            char pathR2[256];
+            strcpy(pathR2, tmpPath);
+
+            strcpy(tmpPath, xmlFilesPath);
+            strcat(tmpPath, "P2.xml");
+            char pathP2[256];
+            strcpy(pathP2, tmpPath);
+
+            strcpy(tmpPath, xmlFilesPath);
+            strcat(tmpPath, "Q.xml");
+            char pathQ[256];
+            strcpy(pathQ, tmpPath);
+
+            strcpy(tmpPath, xmlFilesPath);
+            strcat(tmpPath, "mx1.xml");
+            char pathMX1[256];
+            strcpy(pathMX1, tmpPath);
+
+            strcpy(tmpPath, xmlFilesPath);
+            strcat(tmpPath, "my1.xml");
+            char pathMY1[256];
+            strcpy(pathMY1, tmpPath);
+
+            strcpy(tmpPath, xmlFilesPath);
+            strcat(tmpPath, "mx2.xml");
+            char pathMX2[256];
+            strcpy(pathMX2, tmpPath);
+
+            strcpy(tmpPath, xmlFilesPath);
+            strcat(tmpPath, "my2.xml");
+            char pathMY2[256];
+            strcpy(pathMY2, tmpPath);
+
+            cvSave(pathM1,&_M1);
+            cvSave(pathD1,&_D1);
+            cvSave(pathR1,&_R1);
+            cvSave(pathP1,&_P1);
+            cvSave(pathM2,&_M2);
+            cvSave(pathD2,&_D2);
+            cvSave(pathR2,&_R2);
+            cvSave(pathP2,&_P2);
+            cvSave(pathQ,&_Q);
+            cvSave(pathMX1,mx1);
+            cvSave(pathMY1,my1);
+            cvSave(pathMX2,mx2);
+            cvSave(pathMY2,my2);
         }
 //OR ELSE HARTLEY'S METHOD
         else if( useUncalibrated == 1 || useUncalibrated == 2 )
@@ -397,15 +464,17 @@ int main(int argc, char *argv[])
 {
     int nx, ny;
     float squareSize;
+    char xmlFilesPath[256] = "";
     int fail = 0;
     //Check command line
-    if (argc != 5)
+    if (argc < 5 || argc > 6)
     {
         fprintf(stderr,"USAGE: %s imageList nx ny squareSize\n",argv[0]);
         fprintf(stderr,"\t imageList : Filename of the image list (string). Example : list.txt\n");
         fprintf(stderr,"\t nx : Number of horizontal squares (int > 0). Example : 9\n");
         fprintf(stderr,"\t ny : Number of vertical squares (int > 0). Example : 6\n");
         fprintf(stderr,"\t squareSize : Size of a square (float > 0). Example : 2.5\n");
+        fprintf(stderr,"\t XML files path (optional): path for saving the XML files. Example : /home/myusername/stereocalib/\n");
         return 1;
     } 
 
@@ -429,8 +498,11 @@ int main(int argc, char *argv[])
         fprintf(stderr, "ERROR: squareSize value can not be <= 0\n");
     }   
 
+    if (argc == 6)
+        strcpy(xmlFilesPath, argv[5]);
+
     if(fail != 0) return 1;
 
-    StereoCalib(argv[1], nx, ny, 0, squareSize);
+    StereoCalib(argv[1], nx, ny, 0, squareSize, xmlFilesPath);
     return 0;
 }
