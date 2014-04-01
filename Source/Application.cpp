@@ -43,21 +43,33 @@ void Application::calibrate()
     Pylon::CGrabResultPtr grabResultPtr;
     unsigned int n, w, h;
     float s, d;
-    do
+    if (!SV::EMULATION_MODE)
     {
-        std::cout << "Please enter the following parameters:";
-        std::cout << "[N]umber of stereo photos (5 <= N <= 50): ";
-        std::cin >> n;
-        std::cout << "[W]idth of chessboard corners (W >= 2): ";
-        std::cin >> w;
-        std::cout << "[H]eight of chessboard corners (H >= 2 & H != W): ";
-        std::cin >> h;
-        std::cout << "[S]ize of chessboard square in milimiters (S >= 2.0): ";
-        std::cin >> s;
-        std::cout << "[D]elay between stereo photos capture in seconds (3.0 <= D <= 60.0): ";
-        std::cin >> d;
-    } 
-    while ((n < 5u || n > 50u) || (w < 2u) || (h < 2u || h == w) || (s < 2.f) || (d < 3.f || d > 60.f));
+        do
+        {
+            std::cout << "Please enter the following parameters:";
+            std::cout << "[N]umber of stereo photos (5 <= N <= 50): ";
+            std::cin >> n;
+            std::cout << "[W]idth of chessboard corners (W >= 2): ";
+            std::cin >> w;
+            std::cout << "[H]eight of chessboard corners (H >= 2 & H != W): ";
+            std::cin >> h;
+            std::cout << "[S]ize of chessboard square in milimiters (S >= 2.0): ";
+            std::cin >> s;
+            std::cout << "[D]elay between stereo photos capture in seconds (0.0 <= D <= 60.0): ";
+            std::cin >> d;
+        } 
+        while ((n < 5u || n > 50u) || (w < 2u) || (h < 2u || h == w) || (s < 2.f) || (d < 0.f || d > 60.f));        
+    }
+    else
+    {
+        std::cout << "Emulation Mode: loading emulation parameters..." << std::endl;
+        n = 20u;
+        w = 9u;
+        h = 6u;
+        s = 2.5f;
+        d = 0.f;
+    }
     std::cout << "N = " << n << std::endl;
     std::cout << "W = " << w << std::endl;
     std::cout << "H = " << h << std::endl;

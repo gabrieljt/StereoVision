@@ -2,6 +2,8 @@
 #define SV_UTILITY_HPP
 
 
+#include <opencv2/core/core.hpp>
+
 #include <string>
 
 
@@ -42,6 +44,7 @@ namespace SV
     std::string                 loadCalibrationTimestampFile();
     void                        saveCalibrationTimestampFile();
     int                         forkExecStereoCalibrationModule(unsigned int w, unsigned int h, float s);
+    cv::Scalar                  openCVRandomColor(cv::RNG& rng);
 }
 
 #endif // SV_UTILITY_HPP
