@@ -12,11 +12,10 @@
 #include <fstream>
 
 
-CameraCalibration::CameraCalibration(std::string cameraName, unsigned int* grabCountPtr, std::ofstream* imageListFilePtr, bool emulated)
+CameraCalibration::CameraCalibration(std::string cameraName, unsigned int* grabCountPtr, std::ofstream* imageListFilePtr)
 : mCameraName(cameraName)
 , mGrabCountPtr(grabCountPtr)
 , mImageListFilePtr(imageListFilePtr)
-, mEmulated(emulated)
 {
 	//cv::namedWindow(mCameraName, CV_WINDOW_AUTOSIZE);
 }
@@ -26,10 +25,12 @@ void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylo
 	if (grabResultPtr->GrabSucceeded())
     {        
         // OpenCV image CV_8U: 8-bits, 1 channel        
-        cv::Mat image;
-        mEmulated ? image = cv::imread(SV::EMULATED_IMAGE) : image = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC1, grabResultPtr->GetBuffer());
-        auto cameraContextValue = grabResultPtr->GetCameraContext();             
-        std::string imagePath(SV::CALIBRATION_IMAGES_PATH);
+        auto image = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC1, grabResultPtr->GetBuffer());
+        auto cameraContextValue = grabResultPtr->GetCameraContext();                     
+        std::string imagePath;
+
+        SV::EMULATION_MODE ? imagePath = SV::EMULATED_IMAGES_PATH : imagePath = SV::CALIBRATION_IMAGES_PATH;
+        
         if (*mGrabCountPtr < 10u)
             imagePath += "0";
         imagePath += std::to_string(*mGrabCountPtr);        
@@ -40,9 +41,17 @@ void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylo
         // Right Image
         else if (cameraContextValue == 1)
           	imagePath += SV::CALIBRATION_IMAGE_RIGHT;
+        
+        if (SV::EMULATION_MODE)
+            image = cv::imread(imagePath);
 
         // TODO: save image only if found chessboard corners
-        bool foundChessboardCorners = true;
+        bool foundChessboardCorners;
+        SV::EMULATION_MODE ? 
+            foundChessboardCorners = true 
+        :
+            foundChessboardCorners = true;
+
         if (foundChessboardCorners)
         {
             *mImageListFilePtr << imagePath << std::endl;
@@ -54,6 +63,6 @@ void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylo
     }
     else
     {
-        std::cout << mCameraName << " ERROR: " << grabResultPtr->GetErrorCode() << " " << grabResultPtr->GetErrorDescription() << std::endl;
+        std::cout << mCameraName << "CameraCalibration::OnImageGrabbed() ERROR: " << grabResultPtr->GetErrorCode() << " " << grabResultPtr->GetErrorDescription() << std::endl;
     }
 }

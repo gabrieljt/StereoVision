@@ -18,7 +18,7 @@ namespace Pylon
 class CameraCalibration : public Pylon::CImageEventHandler
 {
 	public:
-						CameraCalibration(std::string cameraName, unsigned int* grabCountPtr, std::ofstream* imageListFilePtr, bool emulated);
+						CameraCalibration(std::string cameraName, unsigned int* grabCountPtr, std::ofstream* imageListFilePtr);
 
 		virtual void	OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylon::CGrabResultPtr& grabResultPtr);
 
@@ -27,7 +27,6 @@ class CameraCalibration : public Pylon::CImageEventHandler
 		std::string		mCameraName;
 		unsigned int* 	mGrabCountPtr;		
 		std::ofstream*	mImageListFilePtr;
-		bool			mEmulated;
 };
 
 #endif // SV_CAMERACALIBRATION_HPP

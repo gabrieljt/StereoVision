@@ -27,6 +27,7 @@ const int           SV::FRAME_TRANSMISSION_DELAY = 4096 + SV::MAIN_LOOP_ITERATIO
 /* Calibration Parameters */
 const std::string   SV::CALIBRATION_BIN = "StereoCalibration";
 const std::string	SV::CALIBRATION_TIMESTAMP_FILE = "Config/Calibration/timestamp.txt";
+const std::string   SV::CALIBRATION_XML_FILES_PATH = "Config/Calibration/XMLFiles/";
 const std::string   SV::CALIBRATION_IMAGES_FILE = "Config/Calibration/list.txt";
 const std::string	SV::CALIBRATION_IMAGES_PATH = "Config/Calibration/Images/";
 const std::string	SV::CALIBRATION_IMAGE_LEFT = "left.ppm";
@@ -34,10 +35,15 @@ const std::string	SV::CALIBRATION_IMAGE_RIGHT = "right.ppm";
 const std::string	SV::NOT_CALIBRATED = "NOT_CALIBRATED";
 
 
+/* Emulation Parameters */
+bool                SV::EMULATION_MODE = false;
+const std::string   SV::EMULATED_CAMERA = "Emulation";
+const std::string   SV::EMULATED_IMAGES_FILE = "Config/Calibration/list_emulation.txt";
+const std::string   SV::EMULATED_IMAGES_PATH = SV::CALIBRATION_IMAGES_PATH + "Emulation/";
+
+
 /* Other Parameters */
 const std::string   SV::lineBreak = "================================\n";
-const std::string	SV::EMULATED_CAMERA = "Emulation";
-const std::string   SV::EMULATED_IMAGE = SV::CALIBRATION_IMAGES_PATH + "checkerboard-small.png";
 
 
 /* Functions */
@@ -87,7 +93,7 @@ int SV::forkExecStereoCalibrationModule(unsigned int w, unsigned int h, float s)
 
     if (result == -1) 
     {
-        std::cout << "SV::forkExecStereoCalibrationModule() ERROR: fork();" << std::endl;
+        std::cout << "SV::forkExecStereoCalibrationModule() ERROR: fork() status " << result << std::endl;
         return result;
     }
 
@@ -95,8 +101,10 @@ int SV::forkExecStereoCalibrationModule(unsigned int w, unsigned int h, float s)
     if (result == 0)
     {         
         std::cout << "Executing Stereo Calibration Module..." << std::endl;
-        result = execl(SV::CALIBRATION_BIN.c_str(), SV::CALIBRATION_BIN.c_str(), SV::CALIBRATION_IMAGES_FILE.c_str(), width.c_str(), height.c_str(), size.c_str(), NULL);
-        std::cout << "exec() failed status: " << result << std::endl;
+        result = execl(SV::CALIBRATION_BIN.c_str(), SV::CALIBRATION_BIN.c_str(), 
+            SV::CALIBRATION_IMAGES_FILE.c_str(), width.c_str(), height.c_str(), size.c_str(), 
+            SV::CALIBRATION_XML_FILES_PATH.c_str(), NULL);
+        std::cout << "SV::forkExecStereoCalibrationModule() ERROR: execl() status " << result << std::endl;
         if (result == -1)
             exit(0);
     }

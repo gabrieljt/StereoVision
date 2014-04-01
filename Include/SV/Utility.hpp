@@ -18,6 +18,7 @@ namespace SV
     /* Calibration Parameters */
     extern const std::string    CALIBRATION_BIN;
     extern const std::string	CALIBRATION_TIMESTAMP_FILE;
+    extern const std::string    CALIBRATION_XML_FILES_PATH;
     extern const std::string    CALIBRATION_IMAGES_FILE;
     extern const std::string    CALIBRATION_IMAGES_PATH;
     extern const std::string    CALIBRATION_IMAGE_LEFT;
@@ -25,10 +26,15 @@ namespace SV
     extern const std::string	NOT_CALIBRATED;
 
 
+    /* Emulation Parameters */
+    extern bool                 EMULATION_MODE;
+    extern const std::string    EMULATED_CAMERA;
+    extern const std::string    EMULATED_IMAGES_FILE;
+    extern const std::string    EMULATED_IMAGES_PATH;
+
+
     /* Other Parameters */
     extern const std::string	lineBreak;
-    extern const std::string    EMULATED_CAMERA;
-    extern const std::string    EMULATED_IMAGE;
 
 
     /* Functions */
