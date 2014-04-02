@@ -7,6 +7,7 @@ set(PYLON_LIBS
     $ENV{PYLON_ROOT}/lib64/libpylonbase.so
     $ENV{PYLON_ROOT}/lib64/libpylonutility.so
     $ENV{PYLON_ROOT}/lib64/libXerces-C_gcc40_v2_7.so
+    $ENV{PYLON_ROOT}/lib64/pylon/tl/pyloncamemu.so
     $ENV{GENICAM_ROOT_V2_3}/bin/Linux64_x64/libGCBase_gcc40_v2_3.so
     $ENV{GENICAM_ROOT_V2_3}/bin/Linux64_x64/libGenApi_gcc40_v2_3.so
     $ENV{GENICAM_ROOT_V2_3}/bin/Linux64_x64/libMathParser_gcc40_v2_3.so
