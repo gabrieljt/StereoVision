@@ -53,10 +53,10 @@ void Application::calibrate()
             std::cin >> h;
             std::cout << "[S]ize of chessboard square in milimiters (S >= 2.0): ";
             std::cin >> s;
-            std::cout << "[D]elay between stereo photos capture in seconds (0.0 <= D <= 60.0): ";
+            std::cout << "[D]elay between stereo photos capture in seconds (3.0 <= D <= 60.0): ";
             std::cin >> d;
         } 
-        while ((n < 5u || n > 50u) || (w < 2u) || (h < 2u || h == w) || (s < 2.f) || (d < 0.f || d > 60.f));        
+        while ((n < 5u || n > 50u) || (w < 2u) || (h < 2u || h == w) || (s < 2.f) || (d < 3.f || d > 60.f));        
     }
     else
     {
@@ -65,7 +65,7 @@ void Application::calibrate()
         w = 9u;
         h = 6u;
         s = 2.5f;
-        d = 0.f;
+        d = 3.5f;
     }
     std::cout << "N = " << n << std::endl;
     std::cout << "W = " << w << std::endl;
@@ -78,10 +78,12 @@ void Application::calibrate()
     std::unique_ptr<unsigned int> grabCountPtr(new unsigned int);
     auto grabCount = grabCountPtr.get();
     *grabCount = 0u;
+    auto currentGrabCount = 0u;    
     std::unique_ptr<std::ofstream> imageListFilePtr(new std::ofstream(SV::CALIBRATION_IMAGES_FILE, std::ofstream::out));
     auto imageListFile = imageListFilePtr.get();
-    registerCameraCalibration(grabCount, imageListFile);    
+
     std::cout << "Prepare to Capture Images for Calibration!" << std::endl;
+    registerCameraCalibration(grabCount, imageListFile);    
     
     // Cameras Synchronization: Round-Robin Strategy
     mCameras.StartGrabbing(Pylon::GrabStrategy_UpcomingImage);       
@@ -89,6 +91,14 @@ void Application::calibrate()
     {            
         // Triggers Calibration Event
         mCameras.RetrieveResult(Pylon::INFINITE, grabResultPtr, Pylon::TimeoutHandling_ThrowException);
+
+        if (*grabCount > currentGrabCount)
+        {
+            currentGrabCount = *grabCount;
+            cv::waitKey(d);
+        }
+        else
+            cv::waitKey(30);
     }
     mCameras.StopGrabbing();
     imageListFile->close();
@@ -126,7 +136,9 @@ void Application::capture()
     
     registerCameraCapture(stereoPhoto);    
     Pylon::CGrabResultPtr grabResultPtr;    
-    mCameras.StartGrabbing();       
+    
+    // Cameras Synchronization: Round-Robin Strategy
+    mCameras.StartGrabbing(Pylon::GrabStrategy_UpcomingImage);       
     while(mCameras.IsGrabbing())
     {
         auto startTime = cv::getTickCount();

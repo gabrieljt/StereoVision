@@ -52,11 +52,14 @@ void CameraCapture::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylon::C
             cameraContextValue == 0 ? image = cv::imread(SV::EMULATED_IMAGES_PATH + "04left.ppm") : image = cv::imread(SV::EMULATED_IMAGES_PATH + "04right.ppm");
 
         cv::Mat undistortedImage;
+
+        // Left Camera
         if (cameraContextValue == 0)
         {
             cv::remap(image, undistortedImage, mCalibrationMatrices[MX1], mCalibrationMatrices[MY1], 0);
             mStereoPhotoPtr->matPair.first = undistortedImage;
         }
+        // Right Camera
         else
         {
             cv::remap(image, undistortedImage, mCalibrationMatrices[MX2], mCalibrationMatrices[MY2], 0);
