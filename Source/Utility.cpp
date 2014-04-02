@@ -27,6 +27,7 @@ const int           SV::FRAME_TRANSMISSION_DELAY = 4096 + SV::MAIN_LOOP_ITERATIO
 /* Calibration Parameters */
 const std::string   SV::CALIBRATION_BIN = "StereoCalibration";
 const std::string	SV::CALIBRATION_TIMESTAMP_FILE = "Config/Calibration/timestamp.txt";
+const std::string   SV::CALIBRATION_PATTERN_FILE = "Config/Calibration/pattern.txt";
 const std::string   SV::CALIBRATION_XML_FILES_PATH = "Config/Calibration/XMLFiles/";
 const std::string   SV::CALIBRATION_IMAGES_FILE = "Config/Calibration/list.txt";
 const std::string	SV::CALIBRATION_IMAGES_PATH = "Config/Calibration/Images/";
@@ -59,13 +60,13 @@ std::string SV::getTimestamp()
 
 std::string SV::loadCalibrationTimestampFile()
 {
-	std::string timestamp;
+	std::string timestamp("1");
     std::ifstream timestampFile(SV::CALIBRATION_TIMESTAMP_FILE, std::ifstream::in);
     if (timestampFile.is_open())
     {
         std::getline(timestampFile, timestamp);
         timestampFile.close();
-    }    
+    }
     
     return timestamp;
 }
@@ -78,6 +79,37 @@ void SV::saveCalibrationTimestampFile()
     {
         timestampFile << timestamp;
         timestampFile.close();
+    }
+}
+
+SV::CalibrationPattern SV::loadCalibrationPatternFile()
+{
+    unsigned int w, h;
+    float s;
+    CalibrationPattern calibrationPattern(0u, 0u, 0.f);
+
+    std::ifstream patternFile(SV::CALIBRATION_PATTERN_FILE, std::ifstream::in);
+    if (patternFile.is_open())
+    {
+        patternFile >> calibrationPattern.w;
+        patternFile >> calibrationPattern.h;
+        patternFile >> calibrationPattern.s;
+        patternFile.close();
+    }        
+
+    return calibrationPattern;
+}
+
+void SV::saveCalibrationPatternFile(unsigned int w, unsigned int h, float s)
+{
+    CalibrationPattern calibrationPattern(w, h, s);
+    std::ofstream patternFile(SV::CALIBRATION_PATTERN_FILE, std::ofstream::out);
+    if (patternFile.is_open())
+    {
+        patternFile << calibrationPattern.w << std::endl;
+        patternFile << calibrationPattern.h << std::endl;
+        patternFile << calibrationPattern.s << std::endl;
+        patternFile.close();
     }
 }
 

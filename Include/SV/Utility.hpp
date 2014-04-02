@@ -20,12 +20,27 @@ namespace SV
     /* Calibration Parameters */
     extern const std::string    CALIBRATION_BIN;
     extern const std::string	CALIBRATION_TIMESTAMP_FILE;
+    extern const std::string    CALIBRATION_PATTERN_FILE;
     extern const std::string    CALIBRATION_XML_FILES_PATH;
     extern const std::string    CALIBRATION_IMAGES_FILE;
     extern const std::string    CALIBRATION_IMAGES_PATH;
     extern const std::string    CALIBRATION_IMAGE_LEFT;
     extern const std::string    CALIBRATION_IMAGE_RIGHT;
     extern const std::string	NOT_CALIBRATED;
+
+    struct CalibrationPattern
+    {
+        CalibrationPattern(unsigned int cornersWidth, unsigned int cornersHeight, float squareSize)
+        : w(cornersWidth)
+        , h(cornersHeight)
+        , s(squareSize)
+        {            
+        }
+
+        unsigned int    w;
+        unsigned int    h;
+        float           s;
+    };
 
 
     /* Emulation Parameters */
@@ -43,6 +58,8 @@ namespace SV
     std::string                 getTimestamp();
     std::string                 loadCalibrationTimestampFile();
     void                        saveCalibrationTimestampFile();
+    CalibrationPattern          loadCalibrationPatternFile();
+    void                        saveCalibrationPatternFile(unsigned int w, unsigned int h, float s);
     int                         forkExecStereoCalibrationModule(unsigned int w, unsigned int h, float s);
     cv::Scalar                  openCVRandomColor(cv::RNG& rng);
 }

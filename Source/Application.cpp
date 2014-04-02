@@ -76,7 +76,7 @@ void Application::calibrate()
     std::cout << "S = " << s << std::endl;
     std::cout << "D = " << d << std::endl;
 
-    // Setup Variables and Shared Pointers
+    // Setup Variables and Shared Pointers between Cameras
     d *= 1000.f;
     std::unique_ptr<unsigned int> grabCountPtr(new unsigned int);
     auto grabCount = grabCountPtr.get();
@@ -103,8 +103,9 @@ void Application::calibrate()
     auto finishTime = (cv::getTickCount() - startTime) / cv::getTickFrequency();
 
     SV::saveCalibrationTimestampFile();    
+    SV::saveCalibrationPatternFile(w, h, s);
     mCalibrated = true;
-    std::cout << "Calibration completed in " << finishTime << " seconds at " << SV::loadCalibrationTimestampFile() << std::endl;
+    std::cout << "Stereo Calibration completed in " << finishTime << " seconds at " << SV::loadCalibrationTimestampFile() << std::endl;
 
     char option;
     bool selected;
@@ -174,7 +175,7 @@ void Application::scheduleCalibration()
         else
         {
             std::cout << "Using calibration performed at " << timestamp << std::endl;
-            mCalibrated = true;
+            mCalibrated = true;            
         }
     }
 }
@@ -209,13 +210,13 @@ void Application::attachDevices()
     }    
 }
 
-void Application::registerCameraCalibration(unsigned int* grabCount, std::ofstream* imageListFile)
+void Application::registerCameraCalibration(unsigned int* grabCountPtr, std::ofstream* imageListFilePtr)
 {
     for (size_t i = 0; i < mDevices.size(); ++i)
     {
         mCameras[i].RegisterImageEventHandler
         (
-            new CameraCalibration(mCameraNames[i], grabCount, imageListFile),
+            new CameraCalibration(mCameraNames[i], grabCountPtr, imageListFilePtr),
             Pylon::RegistrationMode_ReplaceAll,
             Pylon::Cleanup_Delete
         );

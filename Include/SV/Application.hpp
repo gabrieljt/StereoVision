@@ -9,6 +9,12 @@
 #include <string>
 
 
+// Forward declaration
+namespace SV
+{
+    struct CalibrationPattern;
+}
+
 class Application
 {
     public:
@@ -21,7 +27,7 @@ class Application
         void                        capture();
         void                        scheduleCalibration();
         void                        attachDevices();
-        void                        registerCameraCalibration(unsigned int* grabCountPtr, std::ofstream* imageListFile);
+        void                        registerCameraCalibration(unsigned int* grabCountPtr, std::ofstream* imageListFilePtr);
         void                        registerCameraCapture();
         
 

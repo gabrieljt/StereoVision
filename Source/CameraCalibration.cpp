@@ -26,7 +26,7 @@ void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylo
     {        
         // OpenCV image CV_8U: 8-bits, 1 channel        
         auto image = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC1, grabResultPtr->GetBuffer());
-        auto cameraContextValue = grabResultPtr->GetCameraContext();                     
+        auto cameraContextValue = grabResultPtr->GetCameraContext();
         std::string imagePath;
 
         SV::EMULATION_MODE ? imagePath = SV::EMULATED_IMAGES_PATH : imagePath = SV::CALIBRATION_IMAGES_PATH;
