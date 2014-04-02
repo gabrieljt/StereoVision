@@ -5,6 +5,7 @@
 #include <opencv2/core/core.hpp>
 
 #include <string>
+#include <utility>
 
 
 namespace SV
@@ -41,6 +42,13 @@ namespace SV
         unsigned int    h;
         float           s;
     };
+
+    struct StereoPhoto
+    {
+        std::array<std::string, 2>  cameras;
+        std::pair<cv::Mat, cv::Mat> matPair;
+    };
+    
 
 
     /* Emulation Parameters */

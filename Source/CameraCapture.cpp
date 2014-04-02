@@ -1,4 +1,5 @@
 #include <SV/CameraCapture.hpp>
+#include <SV/Utility.hpp>
 
 #include <pylon/InstantCamera.h>
 #include <pylon/GrabResultPtr.h>
@@ -10,7 +11,7 @@
 #include <iostream>
 
 
-CameraCapture::CameraCapture(std::string cameraName)
+CameraCapture::CameraCapture(std::string cameraName, SV::StereoPhoto* stereoPhotoPtr)
 : mCameraName(cameraName)
 , mCalibrationMatrices()
 , mCalibrationMatricesFiles({
@@ -21,9 +22,11 @@ CameraCapture::CameraCapture(std::string cameraName)
                                 SV::CALIBRATION_XML_FILES_PATH + "my2.xml"
                             })
 , mCalibrationMatricesNames({"Q", "mx1", "my1", "mx2", "my2"})
-, mCalibrationPattern(SV::loadCalibrationPatternFile())
+, mPatternSize()
+, mStereoPhotoPtr(stereoPhotoPtr)
 {
     cv::namedWindow(mCameraName, CV_WINDOW_AUTOSIZE);
+    
     // Load Calibration Matrices from the XML files
     for (int i = 0; i < mCalibrationMatrices.size(); ++i)
     {
@@ -31,6 +34,10 @@ CameraCapture::CameraCapture(std::string cameraName)
         fs[mCalibrationMatricesNames[i]] >> mCalibrationMatrices[i];
         fs.release();
     }
+
+    auto calibrationPattern = SV::loadCalibrationPatternFile();
+    mPatternSize.width = calibrationPattern.w;
+    mPatternSize.height = calibrationPattern.h;
 }
 
 void CameraCapture::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylon::CGrabResultPtr& grabResultPtr)
@@ -46,22 +53,66 @@ void CameraCapture::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylon::C
 
         cv::Mat undistortedImage;
         if (cameraContextValue == 0)
-            cv::remap(image, undistortedImage, mCalibrationMatrices[MX1], mCalibrationMatrices[MY1], 0);
-        else
-            cv::remap(image, undistortedImage, mCalibrationMatrices[MX2], mCalibrationMatrices[MY2], 0);
-
-        cv::Size patternSize(mCalibrationPattern.w, mCalibrationPattern.h);        
-        std::vector<cv::Point2f> corners;
-        auto foundChessboard = cv::findChessboardCorners(undistortedImage, patternSize, corners,
-            cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE + cv::CALIB_CB_FAST_CHECK);
-
-        if (foundChessboard)
         {
-            drawChessboardCorners(undistortedImage, patternSize, cv::Mat(corners), foundChessboard);    
-            std::cout << "Corners Found: " << corners.size() << std::endl;           
+            cv::remap(image, undistortedImage, mCalibrationMatrices[MX1], mCalibrationMatrices[MY1], 0);
+            mStereoPhotoPtr->matPair.first = undistortedImage;
         }
-        // Display image
-        cv::imshow(mCameraName, undistortedImage);
+        else
+        {
+            cv::remap(image, undistortedImage, mCalibrationMatrices[MX2], mCalibrationMatrices[MY2], 0);
+            mStereoPhotoPtr->matPair.second = undistortedImage;
+
+            auto undistortedImageLeft = mStereoPhotoPtr->matPair.first;
+            auto undistortedImageRight = mStereoPhotoPtr->matPair.second;
+            auto leftCamera = mStereoPhotoPtr->cameras[0];
+            auto rightCamera = mStereoPhotoPtr->cameras[1];
+
+            std::vector<cv::Point2f> cornersLeft;
+            auto resultLeft = cv::findChessboardCorners(undistortedImageLeft, mPatternSize, cornersLeft,
+                cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE + cv::CALIB_CB_FAST_CHECK);
+            drawChessboardCorners(undistortedImageLeft, mPatternSize, cv::Mat(cornersLeft), resultLeft);
+
+            std::vector<cv::Point2f> cornersRight;
+            auto resultRight = cv::findChessboardCorners(undistortedImageRight, mPatternSize, cornersRight,
+                cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE + cv::CALIB_CB_FAST_CHECK);
+            drawChessboardCorners(undistortedImageRight, mPatternSize, cv::Mat(cornersRight), resultRight);
+
+            if (resultLeft && resultRight)
+                std::cout << "Found " << cornersLeft.size() << " corners." << std::endl;           
+            for (int i = 0; i < cornersLeft.size(); ++i)
+            {
+                auto pointLeftImage = cornersLeft[i];
+                auto pointRightImage = cornersRight[i];
+                auto QMat = mCalibrationMatrices[Q];
+                auto d = pointRightImage.x - pointLeftImage.x;
+                auto X = pointLeftImage.x * QMat.at<double>(0, 0) + QMat.at<double>(0, 3);
+                auto Y = pointLeftImage.y * QMat.at<double>(1, 1) + QMat.at<double>(1, 3);
+                auto Z = QMat.at<double>(2, 3);
+                auto W = d * QMat.at<double>(3, 2) + QMat.at<double>(3, 3);
+
+                X = X / W;
+                Y = Y / W;
+                Z = Z / W;
+                printf("Corner %u >> X: %f; Y:%f; Z:%f;\n", i, X, Y, Z);
+                std::string imageText("(" + std::to_string(X).substr(0,7) +
+                                    ", " + std::to_string(Y).substr(0,7) +
+                                    ", " + std::to_string(Z).substr(0,7) + ")");
+
+                cv::RNG rng(0xFFFFFFFF);
+                if (i == 0 || i == cornersLeft.size() - 1)
+                {
+                    cv::putText(undistortedImageLeft, imageText,
+                        cv::Point2f(pointLeftImage.x, pointLeftImage.y),
+                        rng.uniform(0,8), rng.uniform(10,10)*0.05+0.1, SV::openCVRandomColor(rng), rng.uniform(1, 1), 8);
+
+                    cv::putText(undistortedImageRight, imageText,
+                        cv::Point2f(pointRightImage.x, pointRightImage.y),
+                        rng.uniform(0,8), rng.uniform(10,10)*0.05+0.1, SV::openCVRandomColor(rng), rng.uniform(1, 1), 8);
+                }
+            }
+            cv::imshow(leftCamera, undistortedImageLeft);
+            cv::imshow(rightCamera, undistortedImageRight);
+        }
     }
     else
     {

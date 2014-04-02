@@ -31,7 +31,7 @@ namespace
 class CameraCapture : public Pylon::CImageEventHandler
 {
     public:
-    										CameraCapture(std::string cameraName);
+    										CameraCapture(std::string cameraName, SV::StereoPhoto* stereoPhotoPtr);
 
         virtual void    					OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylon::CGrabResultPtr& grabResultPtr);
 
@@ -41,7 +41,8 @@ class CameraCapture : public Pylon::CImageEventHandler
         std::array<cv::Mat, 5>				mCalibrationMatrices;
         const std::array<std::string, 5>	mCalibrationMatricesFiles;
         const std::array<std::string, 5>	mCalibrationMatricesNames;
-        const SV::CalibrationPattern		mCalibrationPattern;
+        cv::Size                            mPatternSize;        
+        SV::StereoPhoto*                    mStereoPhotoPtr;
 };
 
 #endif // SV_CAMERACAPTURE_HPP

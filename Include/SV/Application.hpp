@@ -1,19 +1,15 @@
 #ifndef SV_APPLICATION_HPP
 #define SV_APPLICATION_HPP
 
+#include <SV/Utility.hpp>
 
 #include <pylon/TlFactory.h>
 #include <pylon/InstantCameraArray.h>
 
 #include <vector>
 #include <string>
+#include <fstream>
 
-
-// Forward declaration
-namespace SV
-{
-    struct CalibrationPattern;
-}
 
 class Application
 {
@@ -28,7 +24,7 @@ class Application
         void                        scheduleCalibration();
         void                        attachDevices();
         void                        registerCameraCalibration(unsigned int* grabCountPtr, std::ofstream* imageListFilePtr);
-        void                        registerCameraCapture();
+        void                        registerCameraCapture(SV::StereoPhoto* stereoPhotoPtr);
         
 
     private:

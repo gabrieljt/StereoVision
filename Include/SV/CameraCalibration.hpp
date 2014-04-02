@@ -5,7 +5,6 @@
 #include <pylon/ImageEventHandler.h>
 
 #include <string>
-#include <mutex>
 #include <fstream>
 
 

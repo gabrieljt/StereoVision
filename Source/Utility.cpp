@@ -149,7 +149,7 @@ int SV::forkExecStereoCalibrationModule(unsigned int w, unsigned int h, float s)
     return 0;
 }
 
-cv::Scalar openCVRandomColor(cv::RNG& rng)
+cv::Scalar SV::openCVRandomColor(cv::RNG& rng)
 {
     int color = (unsigned) rng;
     return cv::Scalar(color&255, (color >> 8)&255, (color >> 16)&255);

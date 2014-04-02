@@ -2,16 +2,13 @@
 #include <SV/CameraCalibration.hpp>
 #include <SV/CameraCapture.hpp>
 #include <SV/CameraConfiguration.hpp>
-#include <SV/Utility.hpp>
 
 #include <opencv2/highgui/highgui.hpp>
 
-#include <iostream>
 #include <memory>
-#include <fstream>
 #include <cassert>
+#include <iostream>
 #include <stdexcept>
-
 
 Application::Application()
 : mAutoInitTerm()
@@ -124,9 +121,11 @@ void Application::calibrate()
 void Application::capture()
 {
     std::cout << SV::lineBreak << "Initializing Capture... Press ESC while focused on any window to exit." << std::endl;
-    registerCameraCapture();    
-    Pylon::CGrabResultPtr grabResultPtr;
+    std::unique_ptr<SV::StereoPhoto> stereoPhotoPtr(new SV::StereoPhoto);
+    auto stereoPhoto = stereoPhotoPtr.get();
     
+    registerCameraCapture(stereoPhoto);    
+    Pylon::CGrabResultPtr grabResultPtr;    
     mCameras.StartGrabbing();       
     while(mCameras.IsGrabbing())
     {
@@ -223,13 +222,14 @@ void Application::registerCameraCalibration(unsigned int* grabCountPtr, std::ofs
     }
 }
 
-void Application::registerCameraCapture()
+void Application::registerCameraCapture(SV::StereoPhoto* stereoPhotoPtr)
 {
     for (size_t i = 0; i < mDevices.size(); ++i)
     {
+        stereoPhotoPtr->cameras[i] = mCameraNames[i];
         mCameras[i].RegisterImageEventHandler
         (
-            new CameraCapture(mCameraNames[i]),
+            new CameraCapture(mCameraNames[i], stereoPhotoPtr),
             Pylon::RegistrationMode_ReplaceAll,
             Pylon::Cleanup_Delete
         );
