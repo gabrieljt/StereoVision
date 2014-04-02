@@ -4,6 +4,8 @@
 
 #include <pylon/ImageEventHandler.h>
 
+#include <opencv2/core/core.hpp>
+
 #include <string>
 #include <fstream>
 
@@ -26,6 +28,7 @@ class CameraCalibration : public Pylon::CImageEventHandler
 		std::string		mCameraName;
 		unsigned int* 	mGrabCountPtr;		
 		std::ofstream*	mImageListFilePtr;
+		cv::Size       	mPatternSize;
 };
 
 #endif // SV_CAMERACALIBRATION_HPP

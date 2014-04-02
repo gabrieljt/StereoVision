@@ -41,7 +41,7 @@ class CameraCapture : public Pylon::CImageEventHandler
         std::array<cv::Mat, 5>				mCalibrationMatrices;
         const std::array<std::string, 5>	mCalibrationMatricesFiles;
         const std::array<std::string, 5>	mCalibrationMatricesNames;
-        cv::Size                            mPatternSize;        
+        cv::Size                            mPatternSize;
         SV::StereoPhoto*                    mStereoPhotoPtr;
 };
 

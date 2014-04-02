@@ -72,6 +72,7 @@ void Application::calibrate()
     std::cout << "H = " << h << std::endl;
     std::cout << "S = " << s << std::endl;
     std::cout << "D = " << d << std::endl;
+    SV::saveCalibrationPatternFile(w, h, s);    
 
     // Setup Variables and Shared Pointers between Cameras
     d *= 1000.f;
@@ -110,7 +111,6 @@ void Application::calibrate()
     auto finishTime = (cv::getTickCount() - startTime) / cv::getTickFrequency();
 
     SV::saveCalibrationTimestampFile();    
-    SV::saveCalibrationPatternFile(w, h, s);
     mCalibrated = true;
     std::cout << "Stereo Calibration completed in " << finishTime << " seconds at " << SV::loadCalibrationTimestampFile() << std::endl;
 

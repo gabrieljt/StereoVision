@@ -4,9 +4,9 @@
 #include <pylon/InstantCamera.h>
 #include <pylon/GrabResultPtr.h>
 
-#include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/calib3d/calib3d.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -16,8 +16,13 @@ CameraCalibration::CameraCalibration(std::string cameraName, unsigned int* grabC
 : mCameraName(cameraName)
 , mGrabCountPtr(grabCountPtr)
 , mImageListFilePtr(imageListFilePtr)
+, mPatternSize()
 {
-	//cv::namedWindow(mCameraName, CV_WINDOW_AUTOSIZE);
+	cv::namedWindow(mCameraName, CV_WINDOW_AUTOSIZE);
+
+	auto calibrationPattern = SV::loadCalibrationPatternFile();
+    mPatternSize.width = calibrationPattern.w;
+    mPatternSize.height = calibrationPattern.h;
 }
 
 void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylon::CGrabResultPtr& grabResultPtr)
@@ -45,13 +50,10 @@ void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylo
         if (SV::EMULATION_MODE)
             image = cv::imread(imagePath);
 
-        // TODO: save image only if found chessboard corners
-        bool foundChessboardCorners;
-        SV::EMULATION_MODE ? 
-            foundChessboardCorners = true 
-        :
-            foundChessboardCorners = true;
-
+        std::vector<cv::Point2f> corners;
+        auto foundChessboardCorners = cv::findChessboardCorners(image, mPatternSize, corners,
+                cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE);
+        // Save image only if found chessboard corners            
         if (foundChessboardCorners)
         {
             *mImageListFilePtr << imagePath << std::endl;
@@ -59,7 +61,9 @@ void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylo
             std::cout << "Photo [" << imagePath << "] saved." << std::endl;
             if (cameraContextValue == 1)
                 *mGrabCountPtr += 1u;
+            drawChessboardCorners(image, mPatternSize, cv::Mat(corners), foundChessboardCorners);            
         }
+        cv::imshow(mCameraName, image);
     }
     else
     {
