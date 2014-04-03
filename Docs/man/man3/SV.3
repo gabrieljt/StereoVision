@@ -1,0 +1,215 @@
+.TH "SV" 3 "Wed Apr 2 2014" "Version 0.1" "StereoVision" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+SV \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Classes"
+
+.in +1c
+.ti -1c
+.RI "struct \fBCalibrationPattern\fP"
+.br
+.ti -1c
+.RI "struct \fBStereoPhoto\fP"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "std::string \fBgetTimestamp\fP ()"
+.br
+.ti -1c
+.RI "std::string \fBloadCalibrationTimestampFile\fP ()"
+.br
+.ti -1c
+.RI "void \fBsaveCalibrationTimestampFile\fP ()"
+.br
+.ti -1c
+.RI "\fBCalibrationPattern\fP \fBloadCalibrationPatternFile\fP ()"
+.br
+.ti -1c
+.RI "void \fBsaveCalibrationPatternFile\fP (unsigned int w, unsigned int h, float s)"
+.br
+.ti -1c
+.RI "int \fBforkExecStereoCalibrationModule\fP (unsigned int w, unsigned int h, float s)"
+.br
+.ti -1c
+.RI "cv::Scalar \fBopenCVRandomColor\fP (cv::RNG &rng)"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "const int \fBMAX_NUMBER_OF_CAMERAS\fP = 2"
+.br
+.ti -1c
+.RI "const char * \fBCONFIGURATION_FILE\fP = 'Config/Camera/default_linux\&.pfs'"
+.br
+.ti -1c
+.RI "int \fBMAIN_LOOP_ITERATION_TIME\fP = 0"
+.br
+.ti -1c
+.RI "const int \fBINTER_PACKET_DELAY\fP = 8192"
+.br
+.ti -1c
+.RI "const int \fBFRAME_TRANSMISSION_DELAY\fP = 4096 + \fBSV::MAIN_LOOP_ITERATION_TIME\fP"
+.br
+.ti -1c
+.RI "const std::string \fBCALIBRATION_BIN\fP = 'StereoCalibration'"
+.br
+.ti -1c
+.RI "const std::string \fBCALIBRATION_TIMESTAMP_FILE\fP = 'Config/Calibration/timestamp\&.txt'"
+.br
+.ti -1c
+.RI "const std::string \fBCALIBRATION_PATTERN_FILE\fP = 'Config/Calibration/pattern\&.txt'"
+.br
+.ti -1c
+.RI "const std::string \fBCALIBRATION_XML_FILES_PATH\fP = 'Config/Calibration/XMLFiles/'"
+.br
+.ti -1c
+.RI "const std::string \fBCALIBRATION_IMAGES_FILE\fP = 'Config/Calibration/list\&.txt'"
+.br
+.ti -1c
+.RI "const std::string \fBCALIBRATION_IMAGES_PATH\fP = 'Config/Calibration/Images/'"
+.br
+.ti -1c
+.RI "const std::string \fBCALIBRATION_IMAGE_LEFT\fP = 'left\&.ppm'"
+.br
+.ti -1c
+.RI "const std::string \fBCALIBRATION_IMAGE_RIGHT\fP = 'right\&.ppm'"
+.br
+.ti -1c
+.RI "const std::string \fBNOT_CALIBRATED\fP = 'NOT_CALIBRATED'"
+.br
+.ti -1c
+.RI "bool \fBEMULATION_MODE\fP = false"
+.br
+.ti -1c
+.RI "const std::string \fBEMULATED_CAMERA\fP = 'Emulation'"
+.br
+.ti -1c
+.RI "const std::string \fBEMULATED_IMAGES_FILE\fP = 'Config/Calibration/list_emulation\&.txt'"
+.br
+.ti -1c
+.RI "const std::string \fBEMULATED_IMAGES_PATH\fP = \fBSV::CALIBRATION_IMAGES_PATH\fP + 'Emulation/'"
+.br
+.ti -1c
+.RI "const std::string \fBlineBreak\fP = '================================\\n'"
+.br
+.in -1c
+.SH "Function Documentation"
+.PP 
+.SS "int SV::forkExecStereoCalibrationModule (unsigned intw, unsigned inth, floats)"
+
+.PP
+Definition at line 116 of file Utility\&.cpp\&.
+.SS "std::string SV::getTimestamp ()"
+
+.PP
+Definition at line 51 of file Utility\&.cpp\&.
+.SS "\fBSV::CalibrationPattern\fP SV::loadCalibrationPatternFile ()"
+
+.PP
+Definition at line 85 of file Utility\&.cpp\&.
+.SS "std::string SV::loadCalibrationTimestampFile ()"
+
+.PP
+Definition at line 61 of file Utility\&.cpp\&.
+.SS "cv::Scalar SV::openCVRandomColor (cv::RNG &rng)"
+
+.PP
+Definition at line 152 of file Utility\&.cpp\&.
+.SS "void SV::saveCalibrationPatternFile (unsigned intw, unsigned inth, floats)"
+
+.PP
+Definition at line 103 of file Utility\&.cpp\&.
+.SS "void SV::saveCalibrationTimestampFile ()"
+
+.PP
+Definition at line 74 of file Utility\&.cpp\&.
+.SH "Variable Documentation"
+.PP 
+.SS "const std::string SV::CALIBRATION_BIN = 'StereoCalibration'"
+
+.PP
+Definition at line 28 of file Utility\&.cpp\&.
+.SS "const std::string SV::CALIBRATION_IMAGE_LEFT = 'left\&.ppm'"
+
+.PP
+Definition at line 34 of file Utility\&.cpp\&.
+.SS "const std::string SV::CALIBRATION_IMAGE_RIGHT = 'right\&.ppm'"
+
+.PP
+Definition at line 35 of file Utility\&.cpp\&.
+.SS "const std::string SV::CALIBRATION_IMAGES_FILE = 'Config/Calibration/list\&.txt'"
+
+.PP
+Definition at line 32 of file Utility\&.cpp\&.
+.SS "const std::string SV::CALIBRATION_IMAGES_PATH = 'Config/Calibration/Images/'"
+
+.PP
+Definition at line 33 of file Utility\&.cpp\&.
+.SS "const std::string SV::CALIBRATION_PATTERN_FILE = 'Config/Calibration/pattern\&.txt'"
+
+.PP
+Definition at line 30 of file Utility\&.cpp\&.
+.SS "const std::string SV::CALIBRATION_TIMESTAMP_FILE = 'Config/Calibration/timestamp\&.txt'"
+
+.PP
+Definition at line 29 of file Utility\&.cpp\&.
+.SS "const std::string SV::CALIBRATION_XML_FILES_PATH = 'Config/Calibration/XMLFiles/'"
+
+.PP
+Definition at line 31 of file Utility\&.cpp\&.
+.SS "const char * SV::CONFIGURATION_FILE = 'Config/Camera/default_linux\&.pfs'"
+
+.PP
+Definition at line 17 of file Utility\&.cpp\&.
+.SS "const std::string SV::EMULATED_CAMERA = 'Emulation'"
+
+.PP
+Definition at line 41 of file Utility\&.cpp\&.
+.SS "const std::string SV::EMULATED_IMAGES_FILE = 'Config/Calibration/list_emulation\&.txt'"
+
+.PP
+Definition at line 42 of file Utility\&.cpp\&.
+.SS "const std::string SV::EMULATED_IMAGES_PATH = \fBSV::CALIBRATION_IMAGES_PATH\fP + 'Emulation/'"
+
+.PP
+Definition at line 43 of file Utility\&.cpp\&.
+.SS "bool SV::EMULATION_MODE = false"
+
+.PP
+Definition at line 40 of file Utility\&.cpp\&.
+.SS "const int SV::FRAME_TRANSMISSION_DELAY = 4096 + \fBSV::MAIN_LOOP_ITERATION_TIME\fP"
+
+.PP
+Definition at line 24 of file Utility\&.cpp\&.
+.SS "const int SV::INTER_PACKET_DELAY = 8192"
+
+.PP
+Definition at line 22 of file Utility\&.cpp\&.
+.SS "const std::string SV::lineBreak = '================================\\n'"
+
+.PP
+Definition at line 47 of file Utility\&.cpp\&.
+.SS "int SV::MAIN_LOOP_ITERATION_TIME = 0"
+
+.PP
+Definition at line 20 of file Utility\&.cpp\&.
+.SS "const int SV::MAX_NUMBER_OF_CAMERAS = 2"
+
+.PP
+Definition at line 15 of file Utility\&.cpp\&.
+.SS "const std::string SV::NOT_CALIBRATED = 'NOT_CALIBRATED'"
+
+.PP
+Definition at line 36 of file Utility\&.cpp\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for StereoVision from the source code\&.

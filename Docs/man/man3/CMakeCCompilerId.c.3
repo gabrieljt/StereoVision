@@ -1,0 +1,114 @@
+.TH "/home/gabriel/Templates/StereoVision/Bin/CMakeFiles/2.8.11.2/CompilerIdC/CMakeCCompilerId.c" 3 "Wed Apr 2 2014" "Version 0.1" "StereoVision" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+/home/gabriel/Templates/StereoVision/Bin/CMakeFiles/2.8.11.2/CompilerIdC/CMakeCCompilerId.c \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Macros"
+
+.in +1c
+.ti -1c
+.RI "#define \fBCOMPILER_ID\fP   ''"
+.br
+.ti -1c
+.RI "#define \fBPLATFORM_ID\fP   ''"
+.br
+.ti -1c
+.RI "#define \fBARCHITECTURE_ID\fP   ''"
+.br
+.ti -1c
+.RI "#define \fBDEC\fP(n)"
+.br
+.ti -1c
+.RI "#define \fBHEX\fP(n)"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "int \fBmain\fP (int argc, char *argv[])"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "char const * \fBinfo_compiler\fP = 'INFO' ':' 'compiler[' COMPILER_ID ']'"
+.br
+.ti -1c
+.RI "char const * \fBinfo_platform\fP = 'INFO' ':' 'platform[' PLATFORM_ID ']'"
+.br
+.ti -1c
+.RI "char const * \fBinfo_arch\fP = 'INFO' ':' 'arch[' ARCHITECTURE_ID ']'"
+.br
+.in -1c
+.SH "Macro Definition Documentation"
+.PP 
+.SS "#define ARCHITECTURE_ID   ''"
+
+.PP
+Definition at line 321 of file CMakeCCompilerId\&.c\&.
+.SS "#define COMPILER_ID   ''"
+
+.PP
+Definition at line 201 of file CMakeCCompilerId\&.c\&.
+.SS "#define DEC(n)"
+\fBValue:\fP
+.PP
+.nf
+('0' + (((n) / 10000000)%10)), \
+  ('0' + (((n) / 1000000)%10)),  \
+  ('0' + (((n) / 100000)%10)),   \
+  ('0' + (((n) / 10000)%10)),    \
+  ('0' + (((n) / 1000)%10)),     \
+  ('0' + (((n) / 100)%10)),      \
+  ('0' + (((n) / 10)%10)),       \
+  ('0' +  ((n) % 10))
+.fi
+.PP
+Definition at line 325 of file CMakeCCompilerId\&.c\&.
+.SS "#define HEX(n)"
+\fBValue:\fP
+.PP
+.nf
+('0' + ((n)>>28 & 0xF)), \
+  ('0' + ((n)>>24 & 0xF)), \
+  ('0' + ((n)>>20 & 0xF)), \
+  ('0' + ((n)>>16 & 0xF)), \
+  ('0' + ((n)>>12 & 0xF)), \
+  ('0' + ((n)>>8  & 0xF)), \
+  ('0' + ((n)>>4  & 0xF)), \
+  ('0' + ((n)     & 0xF))
+.fi
+.PP
+Definition at line 336 of file CMakeCCompilerId\&.c\&.
+.SS "#define PLATFORM_ID   ''"
+
+.PP
+Definition at line 288 of file CMakeCCompilerId\&.c\&.
+.SH "Function Documentation"
+.PP 
+.SS "int main (intargc, char *argv[])"
+
+.PP
+Definition at line 378 of file CMakeCCompilerId\&.c\&.
+.SH "Variable Documentation"
+.PP 
+.SS "char const* info_arch = 'INFO' ':' 'arch[' ARCHITECTURE_ID ']'"
+
+.PP
+Definition at line 369 of file CMakeCCompilerId\&.c\&.
+.SS "char const* info_compiler = 'INFO' ':' 'compiler[' COMPILER_ID ']'"
+
+.PP
+Definition at line 209 of file CMakeCCompilerId\&.c\&.
+.SS "char const* info_platform = 'INFO' ':' 'platform[' PLATFORM_ID ']'"
+
+.PP
+Definition at line 368 of file CMakeCCompilerId\&.c\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for StereoVision from the source code\&.

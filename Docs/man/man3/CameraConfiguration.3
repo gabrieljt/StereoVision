@@ -1,0 +1,48 @@
+.TH "CameraConfiguration" 3 "Wed Apr 2 2014" "Version 0.1" "StereoVision" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+CameraConfiguration \- 
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <CameraConfiguration\&.hpp>\fP
+.PP
+Inherits CConfigurationEventHandler\&.
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBCameraConfiguration\fP (const char *configurationFile, const int interPacketDelay, int frameTransmissionDelay, std::string cameraName)"
+.br
+.ti -1c
+.RI "void \fBOnOpened\fP (Pylon::CInstantCamera &camera)"
+.br
+.ti -1c
+.RI "void \fBOnGrabStarted\fP (Pylon::CInstantCamera &camera)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+Definition at line 16 of file CameraConfiguration\&.hpp\&.
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "CameraConfiguration::CameraConfiguration (const char *configurationFile, const intinterPacketDelay, intframeTransmissionDelay, std::stringcameraName)"
+
+.PP
+Definition at line 12 of file CameraConfiguration\&.cpp\&.
+.SH "Member Function Documentation"
+.PP 
+.SS "void CameraConfiguration::OnGrabStarted (Pylon::CInstantCamera &camera)"
+
+.PP
+Definition at line 48 of file CameraConfiguration\&.cpp\&.
+.SS "void CameraConfiguration::OnOpened (Pylon::CInstantCamera &camera)"
+
+.PP
+Definition at line 20 of file CameraConfiguration\&.cpp\&.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for StereoVision from the source code\&.

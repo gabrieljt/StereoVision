@@ -1,0 +1,128 @@
+.TH "/home/gabriel/Templates/StereoVision/Include/SV/Utility.hpp" 3 "Wed Apr 2 2014" "Version 0.1" "StereoVision" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+/home/gabriel/Templates/StereoVision/Include/SV/Utility.hpp \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <opencv2/core/core\&.hpp>\fP
+.br
+\fC#include <string>\fP
+.br
+\fC#include <utility>\fP
+.br
+
+.SS "Classes"
+
+.in +1c
+.ti -1c
+.RI "struct \fBSV::CalibrationPattern\fP"
+.br
+.ti -1c
+.RI "struct \fBSV::StereoPhoto\fP"
+.br
+.in -1c
+.SS "Namespaces"
+
+.in +1c
+.ti -1c
+.RI "\fBSV\fP"
+.br
+.in -1c
+.SS "Constant Groups"
+
+.in +1c
+.ti -1c
+.RI "\fBSV\fP"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "std::string \fBSV::getTimestamp\fP ()"
+.br
+.ti -1c
+.RI "std::string \fBSV::loadCalibrationTimestampFile\fP ()"
+.br
+.ti -1c
+.RI "void \fBSV::saveCalibrationTimestampFile\fP ()"
+.br
+.ti -1c
+.RI "CalibrationPattern \fBSV::loadCalibrationPatternFile\fP ()"
+.br
+.ti -1c
+.RI "void \fBSV::saveCalibrationPatternFile\fP (unsigned int w, unsigned int h, float s)"
+.br
+.ti -1c
+.RI "int \fBSV::forkExecStereoCalibrationModule\fP (unsigned int w, unsigned int h, float s)"
+.br
+.ti -1c
+.RI "cv::Scalar \fBSV::openCVRandomColor\fP (cv::RNG &rng)"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "const int \fBSV::MAX_NUMBER_OF_CAMERAS\fP = 2"
+.br
+.ti -1c
+.RI "const char * \fBSV::CONFIGURATION_FILE\fP = 'Config/Camera/default_linux\&.pfs'"
+.br
+.ti -1c
+.RI "int \fBSV::MAIN_LOOP_ITERATION_TIME\fP = 0"
+.br
+.ti -1c
+.RI "const int \fBSV::INTER_PACKET_DELAY\fP = 8192"
+.br
+.ti -1c
+.RI "const int \fBSV::FRAME_TRANSMISSION_DELAY\fP = 4096 + \fBSV::MAIN_LOOP_ITERATION_TIME\fP"
+.br
+.ti -1c
+.RI "const std::string \fBSV::CALIBRATION_BIN\fP = 'StereoCalibration'"
+.br
+.ti -1c
+.RI "const std::string \fBSV::CALIBRATION_TIMESTAMP_FILE\fP = 'Config/Calibration/timestamp\&.txt'"
+.br
+.ti -1c
+.RI "const std::string \fBSV::CALIBRATION_PATTERN_FILE\fP = 'Config/Calibration/pattern\&.txt'"
+.br
+.ti -1c
+.RI "const std::string \fBSV::CALIBRATION_XML_FILES_PATH\fP = 'Config/Calibration/XMLFiles/'"
+.br
+.ti -1c
+.RI "const std::string \fBSV::CALIBRATION_IMAGES_FILE\fP = 'Config/Calibration/list\&.txt'"
+.br
+.ti -1c
+.RI "const std::string \fBSV::CALIBRATION_IMAGES_PATH\fP = 'Config/Calibration/Images/'"
+.br
+.ti -1c
+.RI "const std::string \fBSV::CALIBRATION_IMAGE_LEFT\fP = 'left\&.ppm'"
+.br
+.ti -1c
+.RI "const std::string \fBSV::CALIBRATION_IMAGE_RIGHT\fP = 'right\&.ppm'"
+.br
+.ti -1c
+.RI "const std::string \fBSV::NOT_CALIBRATED\fP = 'NOT_CALIBRATED'"
+.br
+.ti -1c
+.RI "bool \fBSV::EMULATION_MODE\fP = false"
+.br
+.ti -1c
+.RI "const std::string \fBSV::EMULATED_CAMERA\fP = 'Emulation'"
+.br
+.ti -1c
+.RI "const std::string \fBSV::EMULATED_IMAGES_FILE\fP = 'Config/Calibration/list_emulation\&.txt'"
+.br
+.ti -1c
+.RI "const std::string \fBSV::EMULATED_IMAGES_PATH\fP = \fBSV::CALIBRATION_IMAGES_PATH\fP + 'Emulation/'"
+.br
+.ti -1c
+.RI "const std::string \fBSV::lineBreak\fP = '================================\\n'"
+.br
+.in -1c
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for StereoVision from the source code\&.

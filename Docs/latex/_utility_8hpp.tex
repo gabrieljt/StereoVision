@@ -1,0 +1,97 @@
+\hypertarget{_utility_8hpp}{\section{/home/gabriel/\-Templates/\-Stereo\-Vision/\-Include/\-S\-V/\-Utility.hpp File Reference}
+\label{_utility_8hpp}\index{/home/gabriel/\-Templates/\-Stereo\-Vision/\-Include/\-S\-V/\-Utility.\-hpp@{/home/gabriel/\-Templates/\-Stereo\-Vision/\-Include/\-S\-V/\-Utility.\-hpp}}
+}
+{\ttfamily \#include $<$opencv2/core/core.\-hpp$>$}\\*
+{\ttfamily \#include $<$string$>$}\\*
+{\ttfamily \#include $<$utility$>$}\\*
+Include dependency graph for Utility.\-hpp\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=312pt]{_utility_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_utility_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{struct_s_v_1_1_calibration_pattern}{S\-V\-::\-Calibration\-Pattern}
+\item 
+struct \hyperlink{struct_s_v_1_1_stereo_photo}{S\-V\-::\-Stereo\-Photo}
+\end{DoxyCompactItemize}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{namespace_s_v}{S\-V}
+\end{DoxyCompactItemize}
+\subsection*{Constant Groups}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{namespace_s_v}{S\-V}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\-::string \hyperlink{namespace_s_v_a9f7b63fd7ff59d018c9033a412abc4c0}{S\-V\-::get\-Timestamp} ()
+\item 
+std\-::string \hyperlink{namespace_s_v_ae32886e460af95f632f666beb6846946}{S\-V\-::load\-Calibration\-Timestamp\-File} ()
+\item 
+void \hyperlink{namespace_s_v_a290f15aeacbb1347daab1947fd4f25a4}{S\-V\-::save\-Calibration\-Timestamp\-File} ()
+\item 
+Calibration\-Pattern \hyperlink{namespace_s_v_a2eeee0cf678d9d481d3d3549b151a4a6}{S\-V\-::load\-Calibration\-Pattern\-File} ()
+\item 
+void \hyperlink{namespace_s_v_ae0b57b979ffff6071335b0e3af71d010}{S\-V\-::save\-Calibration\-Pattern\-File} (unsigned int w, unsigned int h, float s)
+\item 
+int \hyperlink{namespace_s_v_aac43c382d355779c28aac79e5f1a1f2f}{S\-V\-::fork\-Exec\-Stereo\-Calibration\-Module} (unsigned int w, unsigned int h, float s)
+\item 
+cv\-::\-Scalar \hyperlink{namespace_s_v_ad372136d1d33214cd8b7baa169fca11c}{S\-V\-::open\-C\-V\-Random\-Color} (cv\-::\-R\-N\-G \&rng)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const int \hyperlink{namespace_s_v_aa2acf99b8a3b122f688769ef693c30ae}{S\-V\-::\-M\-A\-X\-\_\-\-N\-U\-M\-B\-E\-R\-\_\-\-O\-F\-\_\-\-C\-A\-M\-E\-R\-A\-S} = 2
+\item 
+const char $\ast$ \hyperlink{namespace_s_v_aa00fc841744191453046361becae6ae6}{S\-V\-::\-C\-O\-N\-F\-I\-G\-U\-R\-A\-T\-I\-O\-N\-\_\-\-F\-I\-L\-E} = \char`\"{}Config/Camera/default\-\_\-linux.\-pfs\char`\"{}
+\item 
+int \hyperlink{namespace_s_v_a778a8d19ba21816aca4e8ca6c2dcd4a2}{S\-V\-::\-M\-A\-I\-N\-\_\-\-L\-O\-O\-P\-\_\-\-I\-T\-E\-R\-A\-T\-I\-O\-N\-\_\-\-T\-I\-M\-E} = 0
+\item 
+const int \hyperlink{namespace_s_v_aa245d3d1f71d5a419cefdc42626b1c07}{S\-V\-::\-I\-N\-T\-E\-R\-\_\-\-P\-A\-C\-K\-E\-T\-\_\-\-D\-E\-L\-A\-Y} = 8192
+\item 
+const int \hyperlink{namespace_s_v_a91d9ea38d5f6a4803e3e94ad8c9a722a}{S\-V\-::\-F\-R\-A\-M\-E\-\_\-\-T\-R\-A\-N\-S\-M\-I\-S\-S\-I\-O\-N\-\_\-\-D\-E\-L\-A\-Y} = 4096 + \hyperlink{namespace_s_v_a778a8d19ba21816aca4e8ca6c2dcd4a2}{S\-V\-::\-M\-A\-I\-N\-\_\-\-L\-O\-O\-P\-\_\-\-I\-T\-E\-R\-A\-T\-I\-O\-N\-\_\-\-T\-I\-M\-E}
+\item 
+const std\-::string \hyperlink{namespace_s_v_a07b166ccd37fa68ea084cebb48a1f6f7}{S\-V\-::\-C\-A\-L\-I\-B\-R\-A\-T\-I\-O\-N\-\_\-\-B\-I\-N} = \char`\"{}Stereo\-Calibration\char`\"{}
+\item 
+const std\-::string \hyperlink{namespace_s_v_a25683376004000d485cf2c87db0f6b2a}{S\-V\-::\-C\-A\-L\-I\-B\-R\-A\-T\-I\-O\-N\-\_\-\-T\-I\-M\-E\-S\-T\-A\-M\-P\-\_\-\-F\-I\-L\-E} = \char`\"{}Config/Calibration/timestamp.\-txt\char`\"{}
+\item 
+const std\-::string \hyperlink{namespace_s_v_ab14088c3b114b4905a5064056e160576}{S\-V\-::\-C\-A\-L\-I\-B\-R\-A\-T\-I\-O\-N\-\_\-\-P\-A\-T\-T\-E\-R\-N\-\_\-\-F\-I\-L\-E} = \char`\"{}Config/Calibration/pattern.\-txt\char`\"{}
+\item 
+const std\-::string \hyperlink{namespace_s_v_a08efa5f4f7f6a650b132fe6ce146c7a6}{S\-V\-::\-C\-A\-L\-I\-B\-R\-A\-T\-I\-O\-N\-\_\-\-X\-M\-L\-\_\-\-F\-I\-L\-E\-S\-\_\-\-P\-A\-T\-H} = \char`\"{}Config/Calibration/X\-M\-L\-Files/\char`\"{}
+\item 
+const std\-::string \hyperlink{namespace_s_v_a31f33ecf5d55099dbdcbf01cbdc8f85e}{S\-V\-::\-C\-A\-L\-I\-B\-R\-A\-T\-I\-O\-N\-\_\-\-I\-M\-A\-G\-E\-S\-\_\-\-F\-I\-L\-E} = \char`\"{}Config/Calibration/list.\-txt\char`\"{}
+\item 
+const std\-::string \hyperlink{namespace_s_v_aca9f280a6ae4110ddbfcb3db20c40931}{S\-V\-::\-C\-A\-L\-I\-B\-R\-A\-T\-I\-O\-N\-\_\-\-I\-M\-A\-G\-E\-S\-\_\-\-P\-A\-T\-H} = \char`\"{}Config/Calibration/Images/\char`\"{}
+\item 
+const std\-::string \hyperlink{namespace_s_v_a7eee3c30084ee151a5d8e793f448dfca}{S\-V\-::\-C\-A\-L\-I\-B\-R\-A\-T\-I\-O\-N\-\_\-\-I\-M\-A\-G\-E\-\_\-\-L\-E\-F\-T} = \char`\"{}left.\-ppm\char`\"{}
+\item 
+const std\-::string \hyperlink{namespace_s_v_a6b93f40cb116005baad0fa89d5e3ded3}{S\-V\-::\-C\-A\-L\-I\-B\-R\-A\-T\-I\-O\-N\-\_\-\-I\-M\-A\-G\-E\-\_\-\-R\-I\-G\-H\-T} = \char`\"{}right.\-ppm\char`\"{}
+\item 
+const std\-::string \hyperlink{namespace_s_v_af29adc97546d0aacc73089470104b7e6}{S\-V\-::\-N\-O\-T\-\_\-\-C\-A\-L\-I\-B\-R\-A\-T\-E\-D} = \char`\"{}N\-O\-T\-\_\-\-C\-A\-L\-I\-B\-R\-A\-T\-E\-D\char`\"{}
+\item 
+bool \hyperlink{namespace_s_v_abef27351d2e2c8b13783f080571edca8}{S\-V\-::\-E\-M\-U\-L\-A\-T\-I\-O\-N\-\_\-\-M\-O\-D\-E} = false
+\item 
+const std\-::string \hyperlink{namespace_s_v_ab43026f6f6ee1b8e5cc36194a2ea9e6b}{S\-V\-::\-E\-M\-U\-L\-A\-T\-E\-D\-\_\-\-C\-A\-M\-E\-R\-A} = \char`\"{}Emulation\char`\"{}
+\item 
+const std\-::string \hyperlink{namespace_s_v_a4a601cd489e8ca00c55bb2785c8bb5d9}{S\-V\-::\-E\-M\-U\-L\-A\-T\-E\-D\-\_\-\-I\-M\-A\-G\-E\-S\-\_\-\-F\-I\-L\-E} = \char`\"{}Config/Calibration/list\-\_\-emulation.\-txt\char`\"{}
+\item 
+const std\-::string \hyperlink{namespace_s_v_ab98fb68d38e7637f92d456f945dfd2ff}{S\-V\-::\-E\-M\-U\-L\-A\-T\-E\-D\-\_\-\-I\-M\-A\-G\-E\-S\-\_\-\-P\-A\-T\-H} = \hyperlink{namespace_s_v_aca9f280a6ae4110ddbfcb3db20c40931}{S\-V\-::\-C\-A\-L\-I\-B\-R\-A\-T\-I\-O\-N\-\_\-\-I\-M\-A\-G\-E\-S\-\_\-\-P\-A\-T\-H} + \char`\"{}Emulation/\char`\"{}
+\item 
+const std\-::string \hyperlink{namespace_s_v_aa04b6739e3012b22c033d003c26d5584}{S\-V\-::line\-Break} = \char`\"{}================================\textbackslash{}n\char`\"{}
+\end{DoxyCompactItemize}
