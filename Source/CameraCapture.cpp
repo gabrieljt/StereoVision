@@ -80,37 +80,39 @@ void CameraCapture::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylon::C
                 cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE + cv::CALIB_CB_FAST_CHECK);
             drawChessboardCorners(undistortedImageRight, mPatternSize, cv::Mat(cornersRight), resultRight);
 
-            if (resultLeft && resultRight)
-                std::cout << "Found " << cornersLeft.size() << " corners." << std::endl;           
-            for (int i = 0; i < cornersLeft.size(); ++i)
+            if (resultLeft && resultRight && cornersLeft.size() == cornersRight.size())
             {
-                auto pointLeftImage = cornersLeft[i];
-                auto pointRightImage = cornersRight[i];
-                auto QMat = mCalibrationMatrices[Q];
-                auto d = pointRightImage.x - pointLeftImage.x;
-                auto X = pointLeftImage.x * QMat.at<double>(0, 0) + QMat.at<double>(0, 3);
-                auto Y = pointLeftImage.y * QMat.at<double>(1, 1) + QMat.at<double>(1, 3);
-                auto Z = QMat.at<double>(2, 3);
-                auto W = d * QMat.at<double>(3, 2) + QMat.at<double>(3, 3);
-
-                X = X / W;
-                Y = Y / W;
-                Z = Z / W;
-                printf("Corner %u >> X: %f; Y:%f; Z:%f;\n", i, X, Y, Z);
-                std::string imageText("(" + std::to_string(X).substr(0,7) +
-                                    ", " + std::to_string(Y).substr(0,7) +
-                                    ", " + std::to_string(Z).substr(0,7) + ")");
-
-                cv::RNG rng(0xFFFFFFFF);
-                if (i == 0 || i == cornersLeft.size() - 1)
+                std::cout << "Found " << cornersLeft.size() << " corners." << std::endl;           
+                for (int i = 0; i < cornersLeft.size(); ++i)
                 {
-                    cv::putText(undistortedImageLeft, imageText,
-                        cv::Point2f(pointLeftImage.x, pointLeftImage.y),
-                        rng.uniform(0,8), rng.uniform(10,10)*0.05+0.1, SV::openCVRandomColor(rng), rng.uniform(1, 1), 8);
-
-                    cv::putText(undistortedImageRight, imageText,
-                        cv::Point2f(pointRightImage.x, pointRightImage.y),
-                        rng.uniform(0,8), rng.uniform(10,10)*0.05+0.1, SV::openCVRandomColor(rng), rng.uniform(1, 1), 8);
+                    auto pointLeftImage = cornersLeft[i];
+                    auto pointRightImage = cornersRight[i];
+                    auto QMat = mCalibrationMatrices[Q];
+                    auto d = pointRightImage.x - pointLeftImage.x;
+                    auto X = pointLeftImage.x * QMat.at<double>(0, 0) + QMat.at<double>(0, 3);
+                    auto Y = pointLeftImage.y * QMat.at<double>(1, 1) + QMat.at<double>(1, 3);
+                    auto Z = QMat.at<double>(2, 3);
+                    auto W = d * QMat.at<double>(3, 2) + QMat.at<double>(3, 3);
+    
+                    X = X / W;
+                    Y = Y / W;
+                    Z = Z / W;
+                    printf("Corner %u >> X: %f; Y:%f; Z:%f;\n", i, X, Y, Z);
+                    std::string imageText("(" + std::to_string(X).substr(0,7) +
+                                        ", " + std::to_string(Y).substr(0,7) +
+                                        ", " + std::to_string(Z).substr(0,7) + ")");
+    
+                    cv::RNG rng(0xFFFFFFFF);
+                    if (i == 0 || i == cornersLeft.size() - 1)
+                    {
+                        cv::putText(undistortedImageLeft, imageText,
+                            cv::Point2f(pointLeftImage.x, pointLeftImage.y),
+                            rng.uniform(0,8), rng.uniform(10,10)*0.05+0.1, SV::openCVRandomColor(rng), rng.uniform(1, 1), 8);
+    
+                        cv::putText(undistortedImageRight, imageText,
+                            cv::Point2f(pointRightImage.x, pointRightImage.y),
+                            rng.uniform(0,8), rng.uniform(10,10)*0.05+0.1, SV::openCVRandomColor(rng), rng.uniform(1, 1), 8);
+                    }
                 }
             }
             cv::imshow(leftCamera, undistortedImageLeft);

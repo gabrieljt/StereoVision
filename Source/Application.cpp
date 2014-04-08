@@ -6,6 +6,7 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #include <memory>
+#include <utility>
 #include <cassert>
 #include <iostream>
 #include <stdexcept>
@@ -74,17 +75,24 @@ void Application::calibrate()
     std::cout << "D = " << d << std::endl;
     SV::saveCalibrationPatternFile(w, h, s);    
 
-    // Setup Variables and Shared Pointers between Cameras
+    // Setup Variables and Pointers shared between Cameras    
     d *= 1000.f;
+    std::unique_ptr<bool> synchronizedPtr(new bool);
+    auto synchronized = synchronizedPtr.get();
+    *synchronized = false;
     std::unique_ptr<unsigned int> grabCountPtr(new unsigned int);
     auto grabCount = grabCountPtr.get();
     *grabCount = 0u;
     auto currentGrabCount = 0u;    
     std::unique_ptr<std::ofstream> imageListFilePtr(new std::ofstream(SV::CALIBRATION_IMAGES_FILE, std::ofstream::out));
     auto imageListFile = imageListFilePtr.get();
+    std::unique_ptr<std::pair<bool, bool>> wroteToFilePairPtr(new std::pair<bool, bool>);
+    auto wroteToFilePair = wroteToFilePairPtr.get();
+    wroteToFilePair->first = false;
+    wroteToFilePair->second = false;
 
     std::cout << "Prepare to Capture Images for Calibration!" << std::endl;
-    registerCameraCalibration(grabCount, imageListFile);    
+    registerCameraCalibration(synchronized, grabCount, imageListFile, wroteToFilePair);    
     
     // Cameras Synchronization: Round-Robin Strategy
     mCameras.StartGrabbing(Pylon::GrabStrategy_UpcomingImage);       
@@ -221,13 +229,13 @@ void Application::attachDevices()
     }    
 }
 
-void Application::registerCameraCalibration(unsigned int* grabCountPtr, std::ofstream* imageListFilePtr)
+void Application::registerCameraCalibration(bool* synchronizedPtr, unsigned int* grabCountPtr, std::ofstream* imageListFilePtr, std::pair<bool, bool>* wroteToFilePairPtr)
 {
     for (size_t i = 0; i < mDevices.size(); ++i)
     {
         mCameras[i].RegisterImageEventHandler
         (
-            new CameraCalibration(mCameraNames[i], grabCountPtr, imageListFilePtr),
+            new CameraCalibration(mCameraNames[i], synchronizedPtr, grabCountPtr, imageListFilePtr, wroteToFilePairPtr),
             Pylon::RegistrationMode_ReplaceAll,
             Pylon::Cleanup_Delete
         );

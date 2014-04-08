@@ -23,7 +23,7 @@ class Application
         void                        capture();
         void                        scheduleCalibration();
         void                        attachDevices();
-        void                        registerCameraCalibration(unsigned int* grabCountPtr, std::ofstream* imageListFilePtr);
+        void                        registerCameraCalibration(bool* synchronizedPtr, unsigned int* grabCountPtr, std::ofstream* imageListFilePtr, std::pair<bool, bool>* wroteToFilePairPtr);
         void                        registerCameraCapture(SV::StereoPhoto* stereoPhotoPtr);
         
 

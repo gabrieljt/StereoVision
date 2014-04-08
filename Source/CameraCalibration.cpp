@@ -12,10 +12,12 @@
 #include <fstream>
 
 
-CameraCalibration::CameraCalibration(std::string cameraName, unsigned int* grabCountPtr, std::ofstream* imageListFilePtr)
+CameraCalibration::CameraCalibration(std::string cameraName, bool* synchronizedPtr, unsigned int* grabCountPtr, std::ofstream* imageListFilePtr, std::pair<bool, bool>* wroteToFilePairPtr)
 : mCameraName(cameraName)
+, mSynchronizedPtr(synchronizedPtr)
 , mGrabCountPtr(grabCountPtr)
 , mImageListFilePtr(imageListFilePtr)
+, mWroteToFilePairPtr(wroteToFilePairPtr)
 , mPatternSize()
 {
 	cv::namedWindow(mCameraName, CV_WINDOW_AUTOSIZE);
@@ -42,10 +44,24 @@ void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylo
         
         // Left Image
         if (cameraContextValue == 0)
+        {
            	imagePath += SV::CALIBRATION_IMAGE_LEFT;
+            if (!mWroteToFilePairPtr->first)
+            {
+                *mImageListFilePtr << imagePath << std::endl;            
+                mWroteToFilePairPtr->first = true;            
+            }
+        }
         // Right Image
         else if (cameraContextValue == 1)
-          	imagePath += SV::CALIBRATION_IMAGE_RIGHT;
+        {
+            imagePath += SV::CALIBRATION_IMAGE_RIGHT;
+            if (!mWroteToFilePairPtr->second)
+            {
+                *mImageListFilePtr << imagePath << std::endl;            
+                mWroteToFilePairPtr->second = true;
+            }
+        }        
         
         if (SV::EMULATION_MODE)
             image = cv::imread(imagePath);
@@ -56,13 +72,22 @@ void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylo
         // Save image only if found chessboard corners            
         if (foundChessboardCorners)
         {
-            *mImageListFilePtr << imagePath << std::endl;
             cv::imwrite(imagePath, image);                    
             std::cout << "Photo [" << imagePath << "] saved." << std::endl;
-            if (cameraContextValue == 1)
+            if (cameraContextValue == 0)
+                *mSynchronizedPtr = true;
+            if (cameraContextValue == 1 && *mSynchronizedPtr)
+            {
                 *mGrabCountPtr += 1u;
+                *mSynchronizedPtr = false;                                
+                mWroteToFilePairPtr->first = false;
+                mWroteToFilePairPtr->second = false;
+            }
             drawChessboardCorners(image, mPatternSize, cv::Mat(corners), foundChessboardCorners);            
         }
+        else
+            *mSynchronizedPtr = false;
+
         cv::imshow(mCameraName, image);
     }
     else
