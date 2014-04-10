@@ -19,6 +19,7 @@ CameraCalibration::CameraCalibration(std::string cameraName, bool* synchronizedP
 , mImageListFilePtr(imageListFilePtr)
 , mWroteToFilePairPtr(wroteToFilePairPtr)
 , mPatternSize()
+, mThreshold(0.f)
 {
 	cv::namedWindow(mCameraName, CV_WINDOW_AUTOSIZE);
 
@@ -28,7 +29,7 @@ CameraCalibration::CameraCalibration(std::string cameraName, bool* synchronizedP
 }
 
 void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylon::CGrabResultPtr& grabResultPtr)
-{
+{    
 	if (grabResultPtr->GrabSucceeded())
     {       
         std::string imagePath;
@@ -62,15 +63,17 @@ void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylo
         
         // OpenCV image CV_8U: 8-bits, 1 channel        
         auto imageCamera = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC1, grabResultPtr->GetBuffer());
-        if (SV::EMULATION_MODE)
-            imageCamera = cv::imread(imagePath);
-
-        auto imageHSV = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC3);
-        cv::cvtColor(imageCamera, imageHSV, CV_RGB2HSV); //Change the color format from BGR to HSV
-
+        auto imageGray = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC1);
         auto image = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC1);
-        cv::inRange(imageHSV, cv::Scalar(0,0,0), cv::Scalar(255,255,50), image);
-
+        if (SV::EMULATION_MODE)
+            image = cv::imread(imagePath);
+        else
+        {
+            cv::cvtColor(imageCamera, imageCamera, CV_BayerGB2RGB);                    
+            cv::cvtColor(imageCamera, imageGray, CV_BGR2GRAY);        
+            cv::threshold(imageGray, image, mThreshold, 255, CV_THRESH_BINARY);
+        }        
+        
         std::vector<cv::Point2f> corners;
         auto foundChessboardCorners = cv::findChessboardCorners(image, mPatternSize, corners,
                 cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE);
@@ -87,11 +90,15 @@ void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylo
                 *mSynchronizedPtr = false;                                
                 mWroteToFilePairPtr->first = false;
                 mWroteToFilePairPtr->second = false;
+                mThreshold = 0.f;
             }
             drawChessboardCorners(image, mPatternSize, cv::Mat(corners), foundChessboardCorners);            
         }
         else
+        {            
             *mSynchronizedPtr = false;
+            mThreshold < 255.f ? mThreshold += 1.0f : mThreshold = 0.f;
+        }
 
         cv::imshow(mCameraName, image);
     }
