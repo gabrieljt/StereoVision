@@ -30,18 +30,15 @@ CameraCalibration::CameraCalibration(std::string cameraName, bool* synchronizedP
 void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylon::CGrabResultPtr& grabResultPtr)
 {
 	if (grabResultPtr->GrabSucceeded())
-    {        
-        // OpenCV image CV_8U: 8-bits, 1 channel        
-        auto image = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC1, grabResultPtr->GetBuffer());
-        auto cameraContextValue = grabResultPtr->GetCameraContext();
+    {       
         std::string imagePath;
-
         SV::EMULATION_MODE ? imagePath = SV::EMULATED_IMAGES_PATH : imagePath = SV::CALIBRATION_IMAGES_PATH;
         
         if (*mGrabCountPtr < 10u)
             imagePath += "0";
         imagePath += std::to_string(*mGrabCountPtr);        
         
+        auto cameraContextValue = grabResultPtr->GetCameraContext();        
         // Left Image
         if (cameraContextValue == 0)
         {
@@ -63,8 +60,16 @@ void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylo
             }
         }        
         
+        // OpenCV image CV_8U: 8-bits, 1 channel        
+        auto imageCamera = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC1, grabResultPtr->GetBuffer())
         if (SV::EMULATION_MODE)
-            image = cv::imread(imagePath);
+            imageCamera = cv::imread(imagePath);
+
+        auto imageHSV = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC3);
+        cv::cvtColor(imageCamera, imageHSV, CV_RGB2HSV); //Change the color format from BGR to HSV
+
+        auto image = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC1);
+        cv::inRange(imageHSV, cv::Scalar(0,0,0), cv::Scalar(255,255,50), image);
 
         std::vector<cv::Point2f> corners;
         auto foundChessboardCorners = cv::findChessboardCorners(image, mPatternSize, corners,

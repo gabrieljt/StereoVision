@@ -14,7 +14,9 @@
 /* Camera Parameters */
 const int           SV::MAX_NUMBER_OF_CAMERAS = 2;
 // Windows: default.pfs ; Linux: default_linux.pfs
-const char*         SV::CONFIGURATION_FILE = "Config/Camera/default_linux_lowres.pfs";    
+const char*         SV::CONFIGURATION_FILE = 
+    "Config/Camera/default_linux.pfs";
+    //"Config/Camera/default_linux_lowres.pfs";
 // TODO: dynamic definition; Last checked 18-03-2014
 // Time spent (ticks) in each iteration of the main loop (Camera Capture)
 int                 SV::MAIN_LOOP_ITERATION_TIME = 0;//6899925;                 

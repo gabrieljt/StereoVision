@@ -52,7 +52,7 @@ void Application::calibrate()
             std::cin >> w;
             std::cout << "[H]eight of chessboard corners (H >= 2 & H != W): ";
             std::cin >> h;
-            std::cout << "[S]ize of chessboard square in milimiters (S >= 2.0): ";
+            std::cout << "[S]ize of chessboard square in centimeters (S >= 2.0): ";
             std::cin >> s;
             std::cout << "[D]elay between stereo photos capture in seconds (3.0 <= D <= 60.0): ";
             std::cin >> d;
