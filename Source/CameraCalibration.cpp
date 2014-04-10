@@ -61,7 +61,7 @@ void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylo
         }        
         
         // OpenCV image CV_8U: 8-bits, 1 channel        
-        auto imageCamera = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC1, grabResultPtr->GetBuffer())
+        auto imageCamera = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC1, grabResultPtr->GetBuffer());
         if (SV::EMULATION_MODE)
             imageCamera = cv::imread(imagePath);
 
