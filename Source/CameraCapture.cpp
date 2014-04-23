@@ -24,6 +24,7 @@ CameraCapture::CameraCapture(std::string cameraName, SV::StereoPhoto* stereoPhot
 , mCalibrationMatricesNames({"Q", "mx1", "my1", "mx2", "my2"})
 , mPatternSize()
 , mStereoPhotoPtr(stereoPhotoPtr)
+, mThreshold(50.f)
 {
     cv::namedWindow(mCameraName, CV_WINDOW_AUTOSIZE);
     
@@ -44,13 +45,20 @@ void CameraCapture::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylon::C
 {
     if (grabResultPtr->GrabSucceeded())
     {        
-        // OpenCV image CV_8U: 8-bits, 1 channel
-        auto image = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC1, grabResultPtr->GetBuffer());
-        auto cameraContextValue = grabResultPtr->GetCameraContext();
+        // OpenCV image CV_8U: 8-bits, 1 channel        
+        auto imageCamera = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC1, grabResultPtr->GetBuffer());
+        auto imageGray = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC1);
+        auto image = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC1);
+        auto cameraContextValue = grabResultPtr->GetCameraContext();        
 
-        if (SV::EMULATION_MODE)        
-            cameraContextValue == 0 ? image = cv::imread(SV::EMULATED_IMAGES_PATH + "04left.ppm") : image = cv::imread(SV::EMULATED_IMAGES_PATH + "04right.ppm");
-
+        if (SV::EMULATION_MODE)
+            cameraContextValue == 0 ? image = cv::imread(SV::EMULATED_IMAGES_PATH + "04left.ppm") : image = cv::imread(SV::EMULATED_IMAGES_PATH + "04right.ppm");        
+        else
+        {
+            cv::cvtColor(imageCamera, imageCamera, CV_BayerGB2RGB);                    
+            cv::cvtColor(imageCamera, imageGray, CV_BGR2GRAY);        
+            cv::threshold(imageGray, image, mThreshold, 255, CV_THRESH_BINARY);
+        }                
         cv::Mat undistortedImage;
 
         // Left Camera

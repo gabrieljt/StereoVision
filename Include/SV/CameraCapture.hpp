@@ -43,6 +43,7 @@ class CameraCapture : public Pylon::CImageEventHandler
         const std::array<std::string, 5>	mCalibrationMatricesNames;
         cv::Size                            mPatternSize;
         SV::StereoPhoto*                    mStereoPhotoPtr;
+        float                               mThreshold;
 };
 
 #endif // SV_CAMERACAPTURE_HPP

@@ -19,7 +19,7 @@ CameraCalibration::CameraCalibration(std::string cameraName, bool* synchronizedP
 , mImageListFilePtr(imageListFilePtr)
 , mWroteToFilePairPtr(wroteToFilePairPtr)
 , mPatternSize()
-, mThreshold(0.f)
+, mThreshold(50.f)
 {
 	cv::namedWindow(mCameraName, CV_WINDOW_AUTOSIZE);
 
@@ -90,14 +90,12 @@ void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylo
                 *mSynchronizedPtr = false;                                
                 mWroteToFilePairPtr->first = false;
                 mWroteToFilePairPtr->second = false;
-                mThreshold = 0.f;
             }
             drawChessboardCorners(image, mPatternSize, cv::Mat(corners), foundChessboardCorners);            
         }
         else
         {            
             *mSynchronizedPtr = false;
-            mThreshold < 255.f ? mThreshold += 1.0f : mThreshold = 0.f;
         }
 
         cv::imshow(mCameraName, image);
