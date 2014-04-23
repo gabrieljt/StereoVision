@@ -1,28 +1,78 @@
 #include <SV/Application.hpp>
 
 #include <stdexcept>
+#include <cstdlib>
 #include <iostream>
+#include <unistd.h>
 
-
-int main(int argc, char* argv[])
+void usage()
 {
-	int exitCode = 0;
-    unsigned int n, w, h;
-    float s, d;
-    bool c;
+    std::cerr << "-u    >> prints usage" << std::endl;
+    std::cerr << "-c    >> [C]alibrate cameras with default values" << std::endl;
+    std::cerr << "-n N  >> [N]umber of stereo photos (5 <= N <= 50)" << std::endl;
+    std::cerr << "-w W  >> [W]idth of chessboard corners (W >= 2)" << std::endl;
+}
 
-    // Calibration Parameters default values
-    c = true;  // are cameras calibrated?
-    n = 20u;    // number of photos used in calibration
-    w = 9u;     // chessboard corners width
-    h = 6u;     // chessboard corners height
-    s = 2.5f;   // chessboard square size (centimeters)
-    d = 3.5f;   // delay after taking photo (seconds)
-    // TODO: parse command line args    
-    Application::CalibrationParameters calibrationParameters(c, n, w, h, s, d);
+int main(int argc, char** argv)
+{
+	int exitCode = 0, option;
+    unsigned int n = 20, w = 9, h = 6;
+    float s = 2.5, d = 3.5;
+    bool c, defaultValues = false;
+
+    argc > 1 ? c = false : c = true;
+
+    opterr = 0;
+    while ((option = getopt(argc, argv, "ucnwhsd:")) != -1)
+    {
+        switch (option)
+        {
+            case 'u':
+                usage();
+                return 0;
+            case 'c':
+                defaultValues = true;
+                break;
+            case 'n':
+                n = (unsigned int) optarg;
+                break;
+            case 'w':
+                w = (unsigned int) optarg;
+                break;
+            case 'h':
+                h = (unsigned int) optarg;
+                break;
+            case 's':
+                s = atof(optarg);
+                break;
+            case 'd':
+                d = atof(optarg);
+                break;
+            case '?':
+                usage();
+                return 1;
+            default:
+                abort();
+        }
+
+        if (defaultValues)
+        {
+            n = 20u;    // number of photos used in calibration
+            w = 9u;     // chessboard corners width
+            h = 6u;     // chessboard corners height
+            s = 2.5f;   // chessboard square size (centimeters)
+            d = 3.5f;   // delay after taking photo (seconds)
+        }            
+        else if ((n < 5u || n > 50u) || (w < 2u) || (h < 2u || h == w) || (s < 2.f) || (d < 3.f || d > 60.f)) 
+        {
+            usage();
+            return 1;
+        }
+    }
 
     try
     {
+        Application::CalibrationParameters calibrationParameters(c, n, w, h, s, d);
         Application app(calibrationParameters);
         app.run();
     }
@@ -30,10 +80,7 @@ int main(int argc, char* argv[])
     {
         std::cout << "EXCEPTION: " << e.what() << std::endl;
 		exitCode = 1;
-        std::cout << std::endl << "Press Enter key to exit.";
-        std::cin.get();
     }
-    std::cout << "Bye!" << std::endl;
 
 	return exitCode;
 }
