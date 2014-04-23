@@ -11,15 +11,14 @@
 #include <iostream>
 #include <stdexcept>
 
-Application::Application()
+Application::Application(CalibrationParameters calibrationParameters)
 : mAutoInitTerm()
 , mTransportLayerFactory(Pylon::CTlFactory::GetInstance())
 , mDevices()
 , mCameras(SV::MAX_NUMBER_OF_CAMERAS)
 , mCameraNames()
-, mCalibrated(false)
+, mCalibrationParameters(calibrationParameters)
 {
-    std::cout << "Initializing Stereo Vision..." << std::endl;
     scheduleCalibration();
     attachDevices();    
     // Triggers Configuration Event (CameraConfiguration.cpp)
@@ -29,7 +28,7 @@ Application::Application()
 void Application::run()
 {       
     if (mCameras.IsOpen())            
-        mCalibrated ? capture() : calibrate();
+        mCalibrationParameters.calibrated ? capture() : calibrate();
     else     
         throw std::runtime_error("Application::run() - Failed to Open Cameras");    
     mCameras.Close();
@@ -37,46 +36,11 @@ void Application::run()
 
 void Application::calibrate()
 {
-    std::cout << SV::lineBreak << "Initializing Stereo Calibration Procedure..." << std::endl;
     Pylon::CGrabResultPtr grabResultPtr;
-    unsigned int n, w, h;
-    float s, d;
-    if (!SV::EMULATION_MODE)
-    {
-        do
-        {
-            std::cout << "Please enter the following parameters:";
-            std::cout << "[N]umber of stereo photos (5 <= N <= 50): ";
-            std::cin >> n;
-            std::cout << "[W]idth of chessboard corners (W >= 2): ";
-            std::cin >> w;
-            std::cout << "[H]eight of chessboard corners (H >= 2 & H != W): ";
-            std::cin >> h;
-            std::cout << "[S]ize of chessboard square in centimeters (S >= 2.0): ";
-            std::cin >> s;
-            std::cout << "[D]elay between stereo photos capture in seconds (3.0 <= D <= 60.0): ";
-            std::cin >> d;
-        } 
-        while ((n < 5u || n > 50u) || (w < 2u) || (h < 2u || h == w) || (s < 2.f) || (d < 3.f || d > 60.f));        
-    }
-    else
-    {
-        std::cout << "Emulation Mode: loading emulation parameters..." << std::endl;
-        n = 20u;
-        w = 9u;
-        h = 6u;
-        s = 2.5f;
-        d = 3.5f;
-    }
-    std::cout << "N = " << n << std::endl;
-    std::cout << "W = " << w << std::endl;
-    std::cout << "H = " << h << std::endl;
-    std::cout << "S = " << s << std::endl;
-    std::cout << "D = " << d << std::endl;
-    SV::saveCalibrationPatternFile(w, h, s);    
+    SV::saveCalibrationPatternFile(mCalibrationParameters.width, mCalibrationParameters.height, mCalibrationParameters.size);    
 
     // Setup Variables and Pointers shared between Cameras    
-    d *= 1000.f;
+    float d = mCalibrationParameters.delay * 1000.f;
     std::unique_ptr<bool> synchronizedPtr(new bool);
     auto synchronized = synchronizedPtr.get();
     *synchronized = false;
@@ -96,7 +60,7 @@ void Application::calibrate()
     
     // Cameras Synchronization: Round-Robin Strategy
     mCameras.StartGrabbing(Pylon::GrabStrategy_UpcomingImage);       
-    while (mCameras.IsGrabbing() && *grabCount < n)
+    while (mCameras.IsGrabbing() && *grabCount < mCalibrationParameters.numberPhotos)
     {            
         // Triggers Calibration Event
         mCameras.RetrieveResult(Pylon::INFINITE, grabResultPtr, Pylon::TimeoutHandling_ThrowException);
@@ -111,34 +75,23 @@ void Application::calibrate()
     }
     mCameras.StopGrabbing();
     imageListFile->close();
-    std::cout << "Stereo Photos Captured: " << *grabCount << "/" << n << std::endl;        
+    std::cout << "Stereo Photos Captured: " << *grabCount << "/" << mCalibrationParameters.numberPhotos << std::endl;        
 
     // Start Stereo Calibration Module
     auto startTime = cv::getTickCount();
-    SV::forkExecStereoCalibrationModule(w, h, s);
+    SV::forkExecStereoCalibrationModule(mCalibrationParameters.width, mCalibrationParameters.height, mCalibrationParameters.size);
     auto finishTime = (cv::getTickCount() - startTime) / cv::getTickFrequency();
 
     SV::saveCalibrationTimestampFile();    
-    mCalibrated = true;
+    mCalibrationParameters.calibrated = true;
     std::cout << "Stereo Calibration completed in " << finishTime << " seconds at " << SV::loadCalibrationTimestampFile() << std::endl;
 
-    char option;
-    bool selected;
-    do 
-    {
-        std::cout << "Would you like to start Capturing? [y]es | [n]o: ";
-        std::cin >> option;
-        option == 'y' || option == 'n' ? selected = true : selected = false;
-    }
-    while (!selected);
-
-    if (option == 'y')    
-        capture();    
+    capture();    
 }
 
 void Application::capture()
 {
-    std::cout << SV::lineBreak << "Initializing Capture... Press ESC while focused on any window to exit." << std::endl;
+    std::cout << SV::lineBreak << "Initializing Capture. Press ESC while focused on any window to exit." << std::endl;
     std::unique_ptr<SV::StereoPhoto> stereoPhotoPtr(new SV::StereoPhoto);
     auto stereoPhoto = stereoPhotoPtr.get();
     
@@ -176,26 +129,17 @@ void Application::scheduleCalibration()
     std::string timestamp = SV::loadCalibrationTimestampFile();
 
     if (timestamp == SV::NOT_CALIBRATED || timestamp == "")
+    {
         std::cout << "Cameras have never been calibrated. Scheduling calibration..." << std::endl;
+        mCalibrationParameters.calibrated = false;
+    }
+    else if (!mCalibrationParameters.calibrated)
+    {
+        std::cout << "Overriding last calibration performed at " << timestamp << std::endl;
+    }
     else
     {
-        char option;
-        bool selected;
-        do 
-        {
-            std::cout << "Last calibration performed at " << timestamp << " . Would you like to calibrate again? [y]es | [n]o: ";
-            std::cin >> option;
-            option == 'y' || option == 'n' ? selected = true : selected = false;
-        }
-        while (!selected);
-    
-        if (option == 'y')
-            std::cout << "Scheduling calibration..." << std::endl;
-        else
-        {
-            std::cout << "Using calibration performed at " << timestamp << std::endl;
-            mCalibrated = true;            
-        }
+        std::cout << "Using calibration performed at " << timestamp << std::endl;
     }
 }
 

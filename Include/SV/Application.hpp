@@ -14,7 +14,25 @@
 class Application
 {
     public:
-                                    Application();
+        struct CalibrationParameters
+        {
+            CalibrationParameters(bool c, unsigned int n, unsigned int w, unsigned int h, float s, float d)
+            : calibrated(c)
+            , numberPhotos(n)
+            , width(w)
+            , height(h)
+            , size(s)
+            , delay(d)
+            {                
+            }
+            bool calibrated;
+            unsigned int numberPhotos, width, height;
+            float size, delay;
+        };
+
+        
+    public:
+                                    Application(CalibrationParameters calibrationParameters);
         void                        run();
 
 
@@ -24,7 +42,7 @@ class Application
         void                        scheduleCalibration();
         void                        attachDevices();
         void                        registerCameraCalibration(bool* synchronizedPtr, unsigned int* grabCountPtr, std::ofstream* imageListFilePtr, std::pair<bool, bool>* wroteToFilePairPtr);
-        void                        registerCameraCapture(SV::StereoPhoto* stereoPhotoPtr);
+        void                        registerCameraCapture(SV::StereoPhoto* stereoPhotoPtr);   
         
 
     private:
@@ -33,7 +51,7 @@ class Application
         Pylon::DeviceInfoList_t     mDevices;
         Pylon::CInstantCameraArray  mCameras;   
         std::vector<std::string>    mCameraNames; 
-        bool                        mCalibrated;
+        CalibrationParameters       mCalibrationParameters;
 };
 
 #endif // SV_APPLICATION_HPP

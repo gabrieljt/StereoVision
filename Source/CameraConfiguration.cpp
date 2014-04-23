@@ -35,7 +35,6 @@ void CameraConfiguration::OnOpened(Pylon::CInstantCamera& camera)
     std::cout << "Pixel Format: " << GenApi::CEnumerationPtr(nodeMap.GetNode("PixelFormat"))->ToString() << std::endl;
     std::cout << std::endl;
 
-    std::cout << "Setting Network Parameters..." << std::endl;
     std::cout << "Packet Size: " << GenApi::CIntegerPtr(nodeMap.GetNode("GevSCPSPacketSize"))->GetValue() << std::endl;
     GenApi::CIntegerPtr interpacketDelay(nodeMap.GetNode("GevSCPD"));
     interpacketDelay->SetValue(mInterPacketDelay);
