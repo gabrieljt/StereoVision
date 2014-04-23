@@ -169,7 +169,10 @@ void Application::attachDevices()
             );           
         }
         else
+        {
             SV::EMULATION_MODE = true;
+            mCalibrationParameters.size = 2.5f; // square size in emulation images
+        }
     }    
 }
 
