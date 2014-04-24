@@ -19,7 +19,7 @@ CameraCalibration::CameraCalibration(std::string cameraName, bool* synchronizedP
 , mImageListFilePtr(imageListFilePtr)
 , mWroteToFilePairPtr(wroteToFilePairPtr)
 , mPatternSize()
-, mThreshold(50.f)
+, mThreshold(0.f)
 {
 	cv::namedWindow(mCameraName, CV_WINDOW_AUTOSIZE);
 
@@ -71,7 +71,7 @@ void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylo
         {
             cv::cvtColor(imageCamera, imageCamera, CV_BayerGB2RGB);                    
             cv::cvtColor(imageCamera, imageGray, CV_BGR2GRAY);        
-            cv::threshold(imageGray, image, mThreshold, 255, CV_THRESH_BINARY);
+            cv::threshold(imageGray, image, mThreshold, 255, CV_THRESH_BINARY + CV_THRESH_OTSU);
         }        
         
         std::vector<cv::Point2f> corners;

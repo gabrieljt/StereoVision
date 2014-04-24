@@ -24,7 +24,7 @@ CameraCapture::CameraCapture(std::string cameraName, SV::StereoPhoto* stereoPhot
 , mCalibrationMatricesNames({"Q", "mx1", "my1", "mx2", "my2"})
 , mPatternSize()
 , mStereoPhotoPtr(stereoPhotoPtr)
-, mThreshold(50.f)
+, mThreshold(0.f)
 {
     cv::namedWindow(mCameraName, CV_WINDOW_AUTOSIZE);
     
@@ -57,7 +57,7 @@ void CameraCapture::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylon::C
         {
             cv::cvtColor(imageCamera, imageCamera, CV_BayerGB2RGB);                    
             cv::cvtColor(imageCamera, imageGray, CV_BGR2GRAY);        
-            cv::threshold(imageGray, image, mThreshold, 255, CV_THRESH_BINARY);
+            cv::threshold(imageGray, image, mThreshold, 255, CV_THRESH_BINARY + CV_THRESH_OTSU);
         }                
         cv::Mat undistortedImage;
 
@@ -80,12 +80,12 @@ void CameraCapture::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylon::C
 
             std::vector<cv::Point2f> cornersLeft;
             auto resultLeft = cv::findChessboardCorners(undistortedImageLeft, mPatternSize, cornersLeft,
-                cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE + cv::CALIB_CB_FAST_CHECK);
+                cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE);
             drawChessboardCorners(undistortedImageLeft, mPatternSize, cv::Mat(cornersLeft), resultLeft);
 
             std::vector<cv::Point2f> cornersRight;
             auto resultRight = cv::findChessboardCorners(undistortedImageRight, mPatternSize, cornersRight,
-                cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE + cv::CALIB_CB_FAST_CHECK);
+                cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE);
             drawChessboardCorners(undistortedImageRight, mPatternSize, cv::Mat(cornersRight), resultRight);
 
             if (resultLeft && resultRight && cornersLeft.size() == cornersRight.size())
