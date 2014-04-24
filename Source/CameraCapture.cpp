@@ -49,7 +49,10 @@ void CameraCapture::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylon::C
         auto imageCamera = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC1, grabResultPtr->GetBuffer());
         auto imageGray = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC1);
         auto image = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC1);
-        auto cameraContextValue = grabResultPtr->GetCameraContext();        
+        auto leftImage = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC3);
+        auto rightImage = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC3);
+        auto cameraContextValue = grabResultPtr->GetCameraContext();    
+
 
         if (SV::EMULATION_MODE)
             cameraContextValue == 0 ? image = cv::imread(SV::EMULATED_IMAGES_PATH + "04left.ppm") : image = cv::imread(SV::EMULATED_IMAGES_PATH + "04right.ppm");        
@@ -81,12 +84,13 @@ void CameraCapture::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylon::C
             std::vector<cv::Point2f> cornersLeft;
             auto resultLeft = cv::findChessboardCorners(undistortedImageLeft, mPatternSize, cornersLeft,
                 cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE);
-            drawChessboardCorners(undistortedImageLeft, mPatternSize, cv::Mat(cornersLeft), resultLeft);
 
             std::vector<cv::Point2f> cornersRight;
             auto resultRight = cv::findChessboardCorners(undistortedImageRight, mPatternSize, cornersRight,
                 cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE);
-            drawChessboardCorners(undistortedImageRight, mPatternSize, cv::Mat(cornersRight), resultRight);
+
+            cv::cvtColor(undistortedImageLeft, leftImage, CV_GRAY2BGR);
+            cv::cvtColor(undistortedImageRight, rightImage, CV_GRAY2BGR);                    
 
             if (resultLeft && resultRight && cornersLeft.size() == cornersRight.size())
             {
@@ -109,22 +113,28 @@ void CameraCapture::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylon::C
                     std::string imageText("(" + std::to_string(X).substr(0,7) +
                                         ", " + std::to_string(Y).substr(0,7) +
                                         ", " + std::to_string(Z).substr(0,7) + ")");
-    
+                    
+                    // Drawings                    
+                    drawChessboardCorners(leftImage, mPatternSize, cv::Mat(cornersLeft), resultLeft);
+                    drawChessboardCorners(rightImage, mPatternSize, cv::Mat(cornersRight), resultRight);
                     cv::RNG rng(0xFFFFFFFF);
                     if (i == 0 || i == cornersLeft.size() - 1)
-                    {
-                        cv::putText(undistortedImageLeft, imageText,
+                    {                                   
+                        cv::putText(leftImage, imageText,
                             cv::Point2f(pointLeftImage.x, pointLeftImage.y),
-                            rng.uniform(0,8), rng.uniform(10,10)*0.05+0.1, SV::openCVRandomColor(rng), rng.uniform(1, 1), 8);
+                            CV_FONT_HERSHEY_SCRIPT_SIMPLEX, 2, cv::Scalar(0, 0, 255), 3, 8);
     
-                        cv::putText(undistortedImageRight, imageText,
+                        cv::putText(rightImage, imageText,
                             cv::Point2f(pointRightImage.x, pointRightImage.y),
-                            rng.uniform(0,8), rng.uniform(10,10)*0.05+0.1, SV::openCVRandomColor(rng), rng.uniform(1, 1), 8);
-                    }
+                            CV_FONT_HERSHEY_SCRIPT_SIMPLEX, 2, cv::Scalar(0, 0, 255), 3, 8);
+                    }                    
                 }
-            }
-            cv::imshow(leftCamera, undistortedImageLeft);
-            cv::imshow(rightCamera, undistortedImageRight);
+            }    
+
+            cv::resize(leftImage, leftImage, cv::Size(undistortedImageLeft.cols / 2, undistortedImageLeft.rows / 2));
+            cv::resize(rightImage, rightImage, cv::Size(undistortedImageRight.cols / 2, undistortedImageRight.rows / 2));       
+            cv::imshow(leftCamera, leftImage);
+            cv::imshow(rightCamera, rightImage);        
         }
     }
     else
