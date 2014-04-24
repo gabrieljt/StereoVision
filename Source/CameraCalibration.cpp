@@ -65,6 +65,8 @@ void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylo
         auto imageCamera = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC1, grabResultPtr->GetBuffer());
         auto imageGray = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC1);
         auto image = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC1);
+        auto imageShow = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC3);
+
         if (SV::EMULATION_MODE)
             image = cv::imread(imagePath);
         else
@@ -77,7 +79,8 @@ void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylo
         std::vector<cv::Point2f> corners;
         auto foundChessboardCorners = cv::findChessboardCorners(image, mPatternSize, corners,
                 cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE);
-        // Save image only if found chessboard corners            
+        // Save image only if found chessboard corners       
+        cv::cvtColor(image, imageShow, CV_GRAY2BGR);     
         if (foundChessboardCorners)
         {
             cv::imwrite(imagePath, image);                    
@@ -91,14 +94,14 @@ void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylo
                 mWroteToFilePairPtr->first = false;
                 mWroteToFilePairPtr->second = false;
             }
-            drawChessboardCorners(image, mPatternSize, cv::Mat(corners), foundChessboardCorners);            
+            drawChessboardCorners(imageShow, mPatternSize, cv::Mat(corners), foundChessboardCorners);            
         }
         else
         {            
             *mSynchronizedPtr = false;
         }
-
-        cv::imshow(mCameraName, image);
+        cv::resize(imageShow, imageShow, cv::Size(image.cols / 2, image.rows / 2));
+        cv::imshow(mCameraName, imageShow);
     }
     else
     {
