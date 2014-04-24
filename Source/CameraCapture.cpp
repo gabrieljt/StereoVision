@@ -53,15 +53,13 @@ void CameraCapture::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylon::C
         auto rightImage = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC3);
         auto cameraContextValue = grabResultPtr->GetCameraContext();    
 
-
         if (SV::EMULATION_MODE)
-            cameraContextValue == 0 ? image = cv::imread(SV::EMULATED_IMAGES_PATH + "04left.ppm") : image = cv::imread(SV::EMULATED_IMAGES_PATH + "04right.ppm");        
+            cameraContextValue == 0 ? imageCamera = cv::imread(SV::EMULATED_IMAGES_PATH + "04left.ppm") : imageCamera = cv::imread(SV::EMULATED_IMAGES_PATH + "04right.ppm");        
         else
-        {
             cv::cvtColor(imageCamera, imageCamera, CV_BayerGB2RGB);                    
-            cv::cvtColor(imageCamera, imageGray, CV_BGR2GRAY);        
-            cv::threshold(imageGray, image, mThreshold, 255, CV_THRESH_BINARY + CV_THRESH_OTSU);
-        }                
+
+        cv::cvtColor(imageCamera, imageGray, CV_BGR2GRAY);        
+        cv::threshold(imageGray, image, mThreshold, 255, CV_THRESH_BINARY + CV_THRESH_OTSU);
         cv::Mat undistortedImage;
 
         // Left Camera

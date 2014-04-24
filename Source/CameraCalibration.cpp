@@ -68,19 +68,20 @@ void CameraCalibration::OnImageGrabbed(Pylon::CInstantCamera& camera, const Pylo
         auto imageShow = cv::Mat(grabResultPtr->GetHeight(), grabResultPtr->GetWidth(), CV_8UC3);
 
         if (SV::EMULATION_MODE)
-            image = cv::imread(imagePath);
+            imageCamera = cv::imread(imagePath);
         else
-        {
-            cv::cvtColor(imageCamera, imageCamera, CV_BayerGB2RGB);                    
-            cv::cvtColor(imageCamera, imageGray, CV_BGR2GRAY);        
-            cv::threshold(imageGray, image, mThreshold, 255, CV_THRESH_BINARY + CV_THRESH_OTSU);
-        }        
+            cv::cvtColor(imageCamera, imageCamera, CV_BayerGB2RGB); 
+
+        cv::cvtColor(imageCamera, imageGray, CV_BGR2GRAY);        
+        cv::threshold(imageGray, image, mThreshold, 255, CV_THRESH_BINARY + CV_THRESH_OTSU);
+
         
         std::vector<cv::Point2f> corners;
         auto foundChessboardCorners = cv::findChessboardCorners(image, mPatternSize, corners,
                 cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE);
-        // Save image only if found chessboard corners       
         cv::cvtColor(image, imageShow, CV_GRAY2BGR);     
+
+        // Save image only if found chessboard corners               
         if (foundChessboardCorners)
         {
             cv::imwrite(imagePath, image);                    
